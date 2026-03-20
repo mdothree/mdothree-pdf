@@ -1,0 +1,28 @@
+{
+  "name": "mdothree-pdf",
+  "version": "1.0.0",
+  "description": "PDF Tools \u2014 merge, split, compress, convert. Free & client-side.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve public -p 3000",
+    "preview": "npx serve public -p 3000",
+    "lint": "npx eslint public/js/**/*.js --ext .js",
+    "lint:fix": "npx eslint public/js/**/*.js --ext .js --fix",
+    "test": "echo 'No automated tests yet \u2014 see CONTRIBUTING.md'",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "@eslint/js": "^8.57.0",
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

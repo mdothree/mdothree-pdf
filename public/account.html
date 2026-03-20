@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <title>Account — mdothree</title>
+    <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Account — mdothree" />
+  <meta property="og:description" content="Manage your mdothree Pro subscription, billing, and usage history." />
+  <meta property="og:site_name"   content="mdothree" />
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Manage your mdothree Pro subscription, view usage history, and update billing." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Tools</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="account.html" class="active">Account</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container" style="max-width:780px;">
+
+      <div class="tool-header animate-fade-up">
+        <h1>👤 Your Account</h1>
+        <p>Manage your subscription and review your tool usage.</p>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loadingState" class="panel animate-fade-up" style="text-align:center;padding:48px;">
+        <div class="spinner" style="margin:0 auto 16px;"></div>
+        <p class="text-sm text-muted">Loading account...</p>
+      </div>
+
+      <!-- Not signed in -->
+      <div id="anonState" class="hidden panel animate-fade-up" style="text-align:center;padding:48px;">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔒</div>
+        <h2 style="font-family:var(--font-mono);color:var(--white);font-size:1.1rem;margin-bottom:8px;">No account yet</h2>
+        <p class="text-sm text-muted" style="margin-bottom:24px;">Sign in or upgrade to Pro to see your account details and usage history.</p>
+        <button class="btn btn-primary" id="signUpBtn">Upgrade to Pro →</button>
+      </div>
+
+      <!-- Signed in content -->
+      <div id="accountContent" class="hidden">
+
+        <!-- Subscription status card -->
+        <div class="panel animate-fade-up" id="subCard">
+          <div class="panel-title">Subscription</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+            <div>
+              <div id="planBadge" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:1rem;margin-bottom:8px;"></div>
+              <p id="planDetails" class="text-sm text-muted"></p>
+            </div>
+            <div class="btn-group" id="subActions"></div>
+          </div>
+        </div>
+
+        <!-- Usage history -->
+        <div class="panel mt-20 animate-fade-up-2">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="panel-title" style="border:none;margin:0;padding:0;">Recent Usage</div>
+            <button class="btn btn-ghost" id="refreshHistory" style="padding:6px 12px;font-size:0.78rem;">↻ Refresh</button>
+          </div>
+          <div id="historyList"></div>
+          <div id="historyEmpty" class="hidden" style="text-align:center;padding:32px;color:var(--slate-600);font-family:var(--font-mono);font-size:0.85rem;">
+            No usage history yet. Start using the tools!
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="panel mt-20 animate-fade-up-3" style="border-color:rgba(239,68,68,0.2);">
+          <div class="panel-title" style="color:var(--danger);">Danger Zone</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+            <div>
+              <p class="text-sm" style="color:var(--slate-300);margin-bottom:4px;">Cancel subscription</p>
+              <p class="text-sm text-muted">You'll keep Pro access until the end of your billing period.</p>
+            </div>
+            <button class="btn btn-danger" id="cancelBtn" style="display:none;">Cancel Plan</button>
+          </div>
+        </div>
+
+      </div>
+      <div id="alertArea" class="mt-16"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html">Tools</a>
+        <a href="pricing.html">Pricing</a>
+      </div>
+      <div class="footer-copy">© 2024 mdothree.com</div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/pages/account.js"></script>
+</body>
+</html>

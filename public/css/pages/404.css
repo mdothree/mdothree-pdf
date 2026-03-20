@@ -1,0 +1,38 @@
+/* 404.html page styles */
+
+.err-page {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+    }
+    .err-code {
+      font-family: var(--font-mono);
+      font-size: clamp(5rem, 18vw, 10rem);
+      font-weight: 500;
+      color: var(--slate-800);
+      line-height: 1;
+      margin-bottom: 8px;
+      letter-spacing: -0.04em;
+    }
+    .err-accent {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--emerald);
+      margin-bottom: 16px;
+    }
+    .err-msg {
+      font-size: 1rem;
+      color: var(--slate-400);
+      max-width: 380px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+    .err-links {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }

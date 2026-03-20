@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compress PDF — mdothree</title>
+  <meta name="description" content="Reduce PDF file size with adjustable quality. Remove metadata. Free up to 10MB." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mdothree.com/compress" />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Compress PDF — mdothree" />
+  <meta property="og:description" content="Reduce PDF file size with adjustable quality. Remove metadata. Free up to 10MB." />
+  <meta property="og:url"         content="https://mdothree.com/compress" />
+  <meta property="og:site_name"   content="mdothree" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Compress PDF — mdothree" />
+  <meta name="twitter:description" content="Reduce PDF file size with adjustable quality. Remove metadata. Free up to 10MB." />
+  <!-- PWA -->
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- DNS prefetch / preconnect for external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three <span style="color:var(--slate-600);margin-left:8px;font-size:0.7rem;">/ pdf</span></a>
+      <ul class="nav-links">
+        <li><a href="merge.html">Merge</a></li>
+        <li><a href="split.html">Split</a></li>
+        <li><a href="compress.html" class="active">Compress</a></li>
+        <li><a href="pdf-to-images.html">To Images</a></li>
+        <li><a href="extract-text.html">Extract Text</a></li>
+        <li><a href="images-to-pdf.html">Images→PDF</a></li>
+        <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container">
+      <div class="tool-header animate-fade-up">
+        <div class="breadcrumb"><a href="index.html">PDF Tools</a><span>/</span> Compress</div>
+        <h1>🗜️ Compress PDF</h1>
+        <p>Reduce PDF file size. Adjust quality to balance size and fidelity.</p>
+      </div>
+
+      <div class="alert alert-info animate-fade-up" id="freeBanner" style="margin-bottom:20px;">
+        ℹ️ <strong>Free plan:</strong> Compress files up to 10MB.
+        <a href="#" onclick="requirePremium('Compressing files over 10MB','pdf-compress');return false;" style="color:var(--emerald);text-decoration:none;margin-left:8px;">Upgrade to Pro →</a>
+      </div>
+      <div class="tool-layout" class="animate-fade-up-2">
+        <div>
+          <div class="panel">
+            <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop an image here or click to browse">
+              <input type="file" id="fileInput" accept=".pdf" />
+              <span class="drop-zone-icon">📄</span>
+              <div class="drop-zone-title">Drop PDF here</div>
+              <div class="drop-zone-sub">or click to browse</div>
+            </div>
+            <div id="fileInfo" class="hidden mt-16">
+              <div class="file-item">
+                <span class="file-item-icon">📄</span>
+                <span class="file-item-name" id="fileName">—</span>
+                <span class="file-item-size" id="fileSize">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel mt-16" id="settings" style="display:none;">
+            <div class="panel-title">Compression Settings</div>
+            <div class="form-group">
+              <label class="form-label">Image Quality</label>
+              <div class="range-group">
+                <input type="range" id="quality" min="20" max="95" value="72" />
+                <span class="range-value" id="qualityVal">72%</span>
+              </div>
+            </div>
+            <div class="toggle-group">
+              <label class="toggle">
+                <input type="checkbox" id="removeMetadata" checked />
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label">Remove metadata</span>
+            </div>
+            <div class="btn-group mt-16">
+              <button class="btn btn-primary" id="compressBtn">🗜️ Compress</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel" id="resultPanel" style="display:none;">
+            <div class="panel-title">Results</div>
+            <div class="stats-row" style="flex-direction:column;gap:12px;">
+              <div class="stat-card">
+                <div class="stat-value" id="origSize">—</div>
+                <div class="stat-label">Original size</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="newSize">—</div>
+                <div class="stat-label">Compressed size</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value text-emerald" id="savings">—</div>
+                <div class="stat-label">Reduction</div>
+              </div>
+            </div>
+            <button class="btn btn-primary w-full mt-16" id="downloadBtn" style="display:none;">⬇️ Download</button>
+          </div>
+
+          <div class="panel mt-16">
+            <div class="panel-title">Tips</div>
+            <p class="text-sm text-muted">Lower quality = smaller file. For email attachments, 60–72% is usually fine. For print, keep at 85%+.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="progressWrap" class="hidden" style="margin-top:16px;">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
+      </div>
+      <div id="alertArea"></div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
+
+  
+  <script type="module" src="js/pages/compress.js"></script>
+  <script src="js/nav-toggle.js"></script>
+</body>
+</html>

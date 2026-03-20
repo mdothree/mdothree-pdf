@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extract Text from PDF — mdothree</title>
+  <meta name="description" content="Extract all text from a PDF. Copy to clipboard or download as .txt. No upload needed." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mdothree.com/extract-text" />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Extract Text from PDF — mdothree" />
+  <meta property="og:description" content="Extract all text from a PDF. Copy to clipboard or download as .txt. No upload needed." />
+  <meta property="og:url"         content="https://mdothree.com/extract-text" />
+  <meta property="og:site_name"   content="mdothree" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Extract Text from PDF — mdothree" />
+  <meta name="twitter:description" content="Extract all text from a PDF. Copy to clipboard or download as .txt. No upload needed." />
+  <!-- PWA -->
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- DNS prefetch / preconnect for external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three <span style="color:var(--slate-600);margin-left:8px;font-size:0.7rem;">/ pdf</span></a>
+      <ul class="nav-links">
+        <li><a href="merge.html">Merge</a></li>
+        <li><a href="split.html">Split</a></li>
+        <li><a href="compress.html">Compress</a></li>
+        <li><a href="pdf-to-images.html">To Images</a></li>
+        <li><a href="extract-text.html" class="active">Extract Text</a></li>
+        <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container">
+      <div class="tool-header animate-fade-up">
+        <div class="breadcrumb"><a href="index.html">PDF Tools</a><span>/</span> Extract Text</div>
+        <h1>📝 Extract Text</h1>
+        <p>Pull all text content from a PDF. Copy or download as .txt.</p>
+      </div>
+
+      <div class="tool-layout-right" class="animate-fade-up-2">
+        <div>
+          <div class="panel">
+            <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop a PDF file here or click to browse">
+              <input type="file" id="fileInput" accept=".pdf" />
+              <span class="drop-zone-icon">📄</span>
+              <div class="drop-zone-title">Drop PDF here</div>
+              <div class="drop-zone-sub">or click to browse</div>
+            </div>
+            <div id="fileInfo" class="hidden mt-16">
+              <div class="file-item">
+                <span class="file-item-icon">📄</span>
+                <span class="file-item-name" id="fileName">—</span>
+                <span class="file-item-size" id="pageCount">—</span>
+              </div>
+            </div>
+            <div id="controls" class="hidden mt-16">
+              <div class="form-group">
+                <label class="form-label">Pages (blank = all)</label>
+                <input type="text" class="form-input" id="pageRange" placeholder="e.g. 1-5, 8" />
+              </div>
+              <button class="btn btn-primary w-full" id="extractBtn">📝 Extract Text</button>
+            </div>
+          </div>
+
+          <div class="panel mt-16" id="statsPanel" style="display:none;">
+            <div class="panel-title">Stats</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div><div class="stat-value" id="wordCount">—</div><div class="stat-label">Words</div></div>
+              <div><div class="stat-value" id="charCount">—</div><div class="stat-label">Characters</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="panel-title" style="border:none;margin:0;padding:0;">Extracted Text</div>
+            <div class="btn-group" id="outputActions" style="display:none;">
+              <button class="btn btn-secondary btn-sm" id="copyBtn" style="padding:6px 12px;font-size:0.78rem;">Copy</button>
+              <button class="btn btn-secondary btn-sm" id="downloadTxtBtn" style="padding:6px 12px;font-size:0.78rem;">⬇️ .txt</button>
+            </div>
+          </div>
+          <div class="code-output" id="textOutput" style="min-height:400px;color:var(--slate-400);font-style:italic;">Text will appear here after extraction...</div>
+          <div id="alertArea"></div>
+        </div>
+      </div>
+
+      <div id="progressWrap" class="hidden mt-16">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
+
+  
+  <script type="module" src="js/pages/extract-text.js"></script>
+  <script src="js/nav-toggle.js"></script>
+</body>
+</html>

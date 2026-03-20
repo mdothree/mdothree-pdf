@@ -1,0 +1,21 @@
+{
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": ["warn", { "allow": ["warn", "info", "error"] }],
+    "no-undef": "error",
+    "prefer-const": "warn",
+    "no-var": "error"
+  },
+  "globals": {
+    "QRCode": "readonly",
+    "jsQR": "readonly"
+  }
+}

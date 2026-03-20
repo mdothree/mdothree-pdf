@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merge PDFs — mdothree</title>
+  <meta name="description" content="Combine multiple PDF files into one document. Drag to reorder. Free up to 3 files." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://mdothree.com/merge" />
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Merge PDFs — mdothree" />
+  <meta property="og:description" content="Combine multiple PDF files into one document. Drag to reorder. Free up to 3 files." />
+  <meta property="og:url"         content="https://mdothree.com/merge" />
+  <meta property="og:site_name"   content="mdothree" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Merge PDFs — mdothree" />
+  <meta name="twitter:description" content="Combine multiple PDF files into one document. Drag to reorder. Free up to 3 files." />
+  <!-- PWA -->
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- DNS prefetch / preconnect for external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three <span style="color:var(--slate-600);margin-left:8px;font-size:0.7rem;">/ pdf</span></a>
+      <ul class="nav-links">
+        <li><a href="merge.html" class="active">Merge</a></li>
+        <li><a href="split.html">Split</a></li>
+        <li><a href="compress.html">Compress</a></li>
+        <li><a href="pdf-to-images.html">To Images</a></li>
+        <li><a href="images-to-pdf.html">Images→PDF</a></li>
+        <li><a href="extract-text.html">Extract Text</a></li>
+        <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container">
+      <div class="tool-header animate-fade-up">
+        <div class="breadcrumb"><a href="index.html">PDF Tools</a><span>/</span> Merge</div>
+        <h1>🔗 Merge PDFs</h1>
+        <p>Combine multiple PDF files into a single document. Drag to reorder.</p>
+      </div>
+
+      <div class="alert alert-info animate-fade-up" id="freeLimitBanner" style="margin-bottom:20px;">
+        ℹ️ <strong>Free plan:</strong> Merge up to 3 files · Max 10MB per file.
+        <a href="#" id="upgradeLink" style="color:var(--emerald);text-decoration:none;margin-left:8px;">Upgrade to Pro →</a>
+      </div>
+
+      <div class="panel animate-fade-up-2">
+        <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop PDF files here or click to browse and select multiple files">
+          <input type="file" id="fileInput" accept=".pdf" multiple />
+          <span class="drop-zone-icon">📂</span>
+          <div class="drop-zone-title">Drop PDF files here</div>
+          <div class="drop-zone-sub">or click to browse — select multiple files</div>
+        </div>
+
+        <ul class="file-list" id="fileList"></ul>
+
+        <div id="controls" class="hidden mt-16">
+          <div class="form-group">
+            <label class="form-label">Output filename</label>
+            <input type="text" class="form-input" id="outputName" value="merged.pdf" style="max-width:320px;" />
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="mergeBtn">🔗 Merge PDFs</button>
+            <button class="btn btn-ghost" id="clearBtn">Clear all</button>
+          </div>
+        </div>
+
+        <div id="progressWrap" class="hidden mt-16">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
+        </div>
+        <div id="alertArea"></div>
+      </div>
+
+      <div id="proCard" class="panel mt-16 hidden" style="border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.04);">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.9rem;color:var(--white);margin-bottom:4px;">✨ Need to merge more than 3 files?</div>
+            <p class="text-sm text-muted">Pro lets you merge unlimited files up to 500MB each.</p>
+          </div>
+          <button class="btn btn-primary" id="proCardBtn">Upgrade to Pro →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="footer-inner"><div class="footer-copy">© 2024 mdothree.com</div></div></footer>
+
+  
+  <script type="module" src="js/pages/merge.js"></script>
+  <script src="js/nav-toggle.js"></script>
+</body>
+</html>

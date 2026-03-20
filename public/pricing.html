@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#10B981" />
+  <title>Pricing — mdothree</title>
+    <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="Pricing — mdothree" />
+  <meta property="og:description" content="mdothree Pro: unlimited files, batch ops, JSONPath and more. $4.99/mo with 7-day free trial." />
+  <meta property="og:site_name"   content="mdothree" />
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Pricing — mdothree" />
+  <meta name="twitter:description" content="mdothree Pro — $4.99/month. 7-day free trial. Cancel anytime." />
+  <meta name="description" content="mdothree Pro: unlimited file processing, batch operations, and all premium tools for $4.99/month." />
+  <!-- DNS prefetch / preconnect for external resources -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://js.stripe.com" crossorigin />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/pages/pricing.css" />
+  </head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">m<span class="dot">.</span>three</a>
+      <ul class="nav-links">
+        <li><a href="index.html">Tools</a></li>
+        <li><a href="pricing.html" class="active">Pricing</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="tool-page" id="main-content">
+    <div class="container">
+      <div class="hero" style="padding:48px 0 24px;">
+        <span class="hero-tag animate-fade-up">Simple pricing</span>
+        <h1 class="animate-fade-up-2" style="font-family:var(--font-mono);font-size:clamp(1.8rem,4vw,2.8rem);color:var(--white);margin-bottom:12px;letter-spacing:-0.02em;">Free to use.<br><em style="color:var(--emerald);">Pro when you need it.</em></h1>
+        <p class="animate-fade-up-3" style="color:var(--slate-400);max-width:480px;margin:0 auto;">All core tools are free, forever. Upgrade for unlimited file sizes, batch processing, and advanced features.</p>
+      </div>
+
+      <!-- Plan toggle -->
+      <div style="display:flex;justify-content:center;margin:24px 0;" class="animate-fade-up-4">
+        <div class="tabs">
+          <button class="tab-btn active" data-billing="monthly">Monthly</button>
+          <button class="tab-btn" data-billing="yearly">Yearly <span style="background:var(--emerald);color:var(--slate-950);font-size:0.65rem;padding:2px 8px;border-radius:999px;margin-left:4px;font-weight:600;">Save 33%</span></button>
+        </div>
+      </div>
+
+      <!-- Plan cards -->
+      <div class="pricing-grid animate-fade-up-4">
+        <div class="price-card">
+          <div class="price-name">Free</div>
+          <div class="price-amount"><sup>$</sup>0</div>
+          <div class="price-period">forever</div>
+          <ul class="price-features">
+            <li><span class="check">✅</span> All 30+ tools included</li>
+            <li><span class="check">✅</span> Client-side processing</li>
+            <li><span class="check">✅</span> PDF merge up to 3 files</li>
+            <li><span class="check">✅</span> Files up to 10MB</li>
+            <li><span class="check">✅</span> Single image convert</li>
+            <li><span class="check">✅</span> Up to 5 QR codes batch</li>
+            <li><span class="check">✅</span> Text diff up to 5,000 chars</li>
+            <li><span class="check">✅</span> JSON up to 50KB</li>
+            <li><span class="x">✗</span> <span style="color:var(--slate-500);">JSONPath query tool</span></li>
+            <li><span class="x">✗</span> <span style="color:var(--slate-500);">Usage history</span></li>
+          </ul>
+          <button class="btn btn-secondary w-full" disabled>Current plan</button>
+        </div>
+
+        <div class="price-card featured">
+          <div class="price-badge">Most popular</div>
+          <div class="price-name">Pro</div>
+          <div class="price-amount" id="proAmount"><sup>$</sup>4.99</div>
+          <div class="price-period" id="proPeriod">per month · 7-day free trial</div>
+          <ul class="price-features">
+            <li><span class="check">✅</span> Everything in Free</li>
+            <li><span class="check">✅</span> <strong style="color:var(--white);">Unlimited</strong> file merges</li>
+            <li><span class="check">✅</span> Files up to 500MB</li>
+            <li><span class="check">✅</span> Batch convert unlimited images</li>
+            <li><span class="check">✅</span> Up to 1,000 QR codes batch</li>
+            <li><span class="check">✅</span> Unlimited text diff</li>
+            <li><span class="check">✅</span> Unlimited JSON size</li>
+            <li><span class="check">✅</span> <strong style="color:var(--white);">JSONPath</strong> query tool</li>
+            <li><span class="check">✅</span> Usage history &amp; analytics</li>
+            <li><span class="check">✅</span> Zero ads</li>
+          </ul>
+          <button class="btn btn-primary w-full" id="upgradeBtn">Start 7-Day Free Trial →</button>
+          <p style="text-align:center;font-size:0.72rem;color:var(--slate-600);margin-top:10px;">No charge for 7 days. Cancel anytime.</p>
+        </div>
+      </div>
+
+      <!-- Feature comparison table -->
+      <div class="panel mt-32 animate-fade-up">
+        <div class="panel-title">Full Feature Comparison</div>
+        <div style="overflow-x:auto;">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Free</th>
+                <th class="pro-col">Pro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>PDF merge</td><td>Up to 3 files</td><td class="pro-col">Unlimited</td></tr>
+              <tr><td>PDF file size</td><td>10MB each</td><td class="pro-col">500MB each</td></tr>
+              <tr><td>Image batch convert/compress</td><td>1 at a time</td><td class="pro-col">Unlimited</td></tr>
+              <tr><td>QR batch generation</td><td>5 codes</td><td class="pro-col">1,000 codes</td></tr>
+              <tr><td>Text diff</td><td>5,000 chars</td><td class="pro-col">Unlimited</td></tr>
+              <tr><td>JSON formatting</td><td>50KB</td><td class="pro-col">Unlimited</td></tr>
+              <tr><td>JSONPath query tool</td><td>✗</td><td class="pro-col">✅</td></tr>
+              <tr><td>Usage history</td><td>✗</td><td class="pro-col">✅</td></tr>
+              <tr><td>Ads</td><td>Possible</td><td class="pro-col">Never</td></tr>
+              <tr><td>Support</td><td>Community</td><td class="pro-col">Priority email</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="panel mt-24 animate-fade-up" style="max-width:640px;margin-left:auto;margin-right:auto;">
+        <div class="panel-title">Frequently Asked Questions</div>
+        <div id="faq"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html">Tools</a>
+        <a href="account.html">Account</a>
+      </div>
+      <div class="footer-copy">© 2024 mdothree.com</div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/pages/pricing.js"></script>
+</body>
+</html>
