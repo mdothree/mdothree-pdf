@@ -8,7 +8,7 @@
  */
 
 import { ENV } from './env.js';
-import { auth, db, initFirebase } from './firebase.js';
+import { auth, db, initFirebase } from './config/firebase.js';
 // Firestore is read through the namespaced (compat) SDK that the pages load
 // via <script> tags (see config/firebase.js). The modular getDoc/doc API used
 // previously cannot operate on a compat Firestore instance, so the Pro check
