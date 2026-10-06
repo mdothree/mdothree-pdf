@@ -38,7 +38,7 @@ initPaywall();
     convertBtn.addEventListener('click', async () => {
       if (!currentFile) return;
       if (currentFile && currentFile.size > FREE_LIMITS.pdfFileSizeMB * 1024 * 1024 && !isPremium()) {
-        requirePremium(\`Converting PDFs over 10MB to images requires Pro\`, 'pdf-to-images-size');
+        requirePremium(`Converting PDFs over 10MB to images requires Pro`, 'pdf-to-images-size');
         return;
       }
       
