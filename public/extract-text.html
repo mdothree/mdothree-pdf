@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Extract Text from PDF — mdothree</title>
+  <title>Extract Text from PDF</title>
   <meta name="description" content="Extract all text from a PDF. Copy to clipboard or download as .txt. No upload needed." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://mdothree.com/extract-text" />
+  <link rel="canonical" href="https://pdf.mdothree.com/extract-text" />
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="Extract Text from PDF — mdothree" />
+  <meta property="og:title"       content="Extract Text from PDF" />
   <meta property="og:description" content="Extract all text from a PDF. Copy to clipboard or download as .txt. No upload needed." />
-  <meta property="og:url"         content="https://mdothree.com/extract-text" />
+  <meta property="og:url"         content="https://pdf.mdothree.com/extract-text" />
   <meta property="og:site_name"   content="mdothree" />
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="Extract Text from PDF — mdothree" />
+  <meta name="twitter:title"       content="Extract Text from PDF" />
   <meta name="twitter:description" content="Extract all text from a PDF. Copy to clipboard or download as .txt. No upload needed." />
   <!-- PWA -->
   <meta name="color-scheme" content="dark light" />
@@ -44,6 +44,7 @@
         <li><a href="split.html">Split</a></li>
         <li><a href="compress.html">Compress</a></li>
         <li><a href="pdf-to-images.html">To Images</a></li>
+        <li><a href="images-to-pdf.html">Images→PDF</a></li>
         <li><a href="extract-text.html" class="active">Extract Text</a></li>
         <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
         <li><a href="account.html">Account</a></li>
@@ -60,7 +61,7 @@
         <p>Pull all text content from a PDF. Copy or download as .txt.</p>
       </div>
 
-      <div class="tool-layout-right" class="animate-fade-up-2">
+      <div class="tool-layout-right animate-fade-up-2">
         <div>
           <div class="panel">
             <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop a PDF file here or click to browse">
@@ -83,6 +84,11 @@
               </div>
               <button class="btn btn-primary w-full" id="extractBtn">📝 Extract Text</button>
             </div>
+            <div id="progressWrap" class="hidden mt-16">
+              <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+              <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
+            </div>
+            <div id="alertArea" role="status" aria-live="polite"></div>
           </div>
 
           <div class="panel mt-16" id="statsPanel" style="display:none;">
@@ -103,14 +109,9 @@
             </div>
           </div>
           <div class="code-output" id="textOutput" style="min-height:400px;color:var(--slate-400);font-style:italic;">Text will appear here after extraction...</div>
-          <div id="alertArea"></div>
         </div>
       </div>
 
-      <div id="progressWrap" class="hidden mt-16">
-        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-        <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
-      </div>
     </div>
   </main>
 

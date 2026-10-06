@@ -4,7 +4,10 @@ const PDFJS_CDN = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.mi
 const PDFJS_WORKER = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
 export async function extractText(file, options = {}, onProgress = () => {}) {
-  const pdfjsLib = await import(PDFJS_CDN);
+  // The jsDelivr +esm build of pdfjs 3.x only exposes GlobalWorkerOptions on
+  // the default export (the CJS exports object), not as a named export.
+  const pdfjsMod = await import(PDFJS_CDN);
+  const pdfjsLib = pdfjsMod.default ?? pdfjsMod;
   pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
 
   onProgress(10, 'Loading PDF...');
@@ -29,10 +32,13 @@ export async function extractText(file, options = {}, onProgress = () => {}) {
     const page = await pdf.getPage(pageNum);
     const textContent = await page.getTextContent();
 
+    // Keep the PDF's line breaks (hasEOL) instead of flattening each page
+    // into a single paragraph.
     const pageText = textContent.items
-      .map(item => item.str)
-      .join(' ')
-      .replace(/  +/g, ' ')
+      .map(item => (item.str || '') + (item.hasEOL ? '\n' : ' '))
+      .join('')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/ {2,}/g, ' ')
       .trim();
 
     fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;

@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compress PDF — mdothree</title>
+  <title>Compress PDF</title>
   <meta name="description" content="Reduce PDF file size with adjustable quality. Remove metadata. Free up to 10MB." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://mdothree.com/compress" />
+  <link rel="canonical" href="https://pdf.mdothree.com/compress" />
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="Compress PDF — mdothree" />
+  <meta property="og:title"       content="Compress PDF" />
   <meta property="og:description" content="Reduce PDF file size with adjustable quality. Remove metadata. Free up to 10MB." />
-  <meta property="og:url"         content="https://mdothree.com/compress" />
+  <meta property="og:url"         content="https://pdf.mdothree.com/compress" />
   <meta property="og:site_name"   content="mdothree" />
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary" />
-  <meta name="twitter:title"       content="Compress PDF — mdothree" />
+  <meta name="twitter:title"       content="Compress PDF" />
   <meta name="twitter:description" content="Reduce PDF file size with adjustable quality. Remove metadata. Free up to 10MB." />
   <!-- PWA -->
   <meta name="color-scheme" content="dark light" />
@@ -44,8 +44,8 @@
         <li><a href="split.html">Split</a></li>
         <li><a href="compress.html" class="active">Compress</a></li>
         <li><a href="pdf-to-images.html">To Images</a></li>
-        <li><a href="extract-text.html">Extract Text</a></li>
         <li><a href="images-to-pdf.html">Images→PDF</a></li>
+        <li><a href="extract-text.html">Extract Text</a></li>
         <li style="margin-left:auto;"><a href="pricing.html">Pricing</a></li>
         <li><a href="account.html">Account</a></li>
       </ul>
@@ -65,10 +65,10 @@
         ℹ️ <strong>Free plan:</strong> Compress files up to 10MB.
         <a href="#" onclick="requirePremium('Compressing files over 10MB','pdf-compress');return false;" style="color:var(--emerald);text-decoration:none;margin-left:8px;">Upgrade to Pro →</a>
       </div>
-      <div class="tool-layout" class="animate-fade-up-2">
+      <div class="tool-layout animate-fade-up-2">
         <div>
           <div class="panel">
-            <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop an image here or click to browse">
+            <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Drop a PDF here or click to browse">
               <input type="file" id="fileInput" accept=".pdf" />
               <span class="drop-zone-icon">📄</span>
               <div class="drop-zone-title">Drop PDF here</div>
@@ -103,6 +103,11 @@
               <button class="btn btn-primary" id="compressBtn">🗜️ Compress</button>
             </div>
           </div>
+          <div id="progressWrap" class="hidden" style="margin-top:16px;">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
+          </div>
+          <div id="alertArea" role="status" aria-live="polite"></div>
         </div>
 
         <div>
@@ -128,15 +133,11 @@
           <div class="panel mt-16">
             <div class="panel-title">Tips</div>
             <p class="text-sm text-muted">Lower quality = smaller file. For email attachments, 60–72% is usually fine. For print, keep at 85%+.</p>
+            <p class="text-sm text-muted mt-8">Compression re-renders each page as an image, so text in the result can't be selected or searched. If the result would be larger than your file, the original is kept.</p>
           </div>
         </div>
       </div>
 
-      <div id="progressWrap" class="hidden" style="margin-top:16px;">
-        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-        <p class="text-sm text-muted mt-8" id="progressLabel">Processing...</p>
-      </div>
-      <div id="alertArea"></div>
     </div>
   </main>
 

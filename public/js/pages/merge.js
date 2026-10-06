@@ -1,6 +1,6 @@
 // Page controller: merge.html
 import { mergePDFs } from '../services/pdfMerge.js';
-    import { formatBytes } from '../utils/fileHandlers.js';
+    import { formatBytes, isPdfFile, downloadBlob } from '../utils/fileHandlers.js';
     import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
     import { saveToHistory } from '../config/firebase.js';
 
@@ -29,9 +29,11 @@ import { mergePDFs } from '../services/pdfMerge.js';
         li.className = 'file-item'; li.draggable = true; li.dataset.index = i;
         li.innerHTML = `
           <span class="file-item-icon">${oversized ? '⚠️' : '📄'}</span>
-          <span class="file-item-name" style="${oversized ? 'color:var(--warning)' : ''}">${f.name}${oversized ? ' — exceeds free 10MB limit' : ''}</span>
+          <span class="file-item-name" style="${oversized ? 'color:var(--warning)' : ''}"></span>
           <span class="file-item-size">${formatBytes(f.size)}</span>
-          <button class="file-item-remove" data-i="${i}">✕</button>`;
+          <button class="file-item-remove" data-i="${i}" aria-label="Remove">✕</button>`;
+        // File names are user data: set as text, never as HTML.
+        li.querySelector('.file-item-name').textContent = f.name + (oversized ? ' — exceeds free 10MB limit' : '');
         fileList.appendChild(li);
       });
 
@@ -61,13 +63,23 @@ import { mergePDFs } from '../services/pdfMerge.js';
     }
 
     function addFiles(newFiles) {
-      files = [...files, ...Array.from(newFiles).filter(f => f.type==='application/pdf')];
+      const all = Array.from(newFiles);
+      const pdfs = all.filter(isPdfFile);
+      const alertArea = document.getElementById('alertArea');
+      alertArea.innerHTML = '';
+      if (pdfs.length < all.length) {
+        const div = document.createElement('div');
+        div.className = 'alert alert-error';
+        div.textContent = `❌ ${all.length - pdfs.length} file${all.length - pdfs.length > 1 ? 's were' : ' was'} skipped — only PDF files can be merged.`;
+        alertArea.appendChild(div);
+      }
+      files = [...files, ...pdfs];
       renderList();
     }
 
     const dropZone  = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    fileInput.addEventListener('change', () => addFiles(fileInput.files));
+    fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
     dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); addFiles(e.dataTransfer.files); });
@@ -87,18 +99,23 @@ import { mergePDFs } from '../services/pdfMerge.js';
       document.getElementById('progressWrap').classList.remove('hidden');
       document.getElementById('alertArea').innerHTML = '';
       try {
-        const outputName = document.getElementById('outputName').value || 'merged.pdf';
+        let outputName = document.getElementById('outputName').value.trim() || 'merged.pdf';
+        if (!/\.pdf$/i.test(outputName)) outputName += '.pdf';
         const blob = await mergePDFs(files, (pct, label) => {
           document.getElementById('progressFill').style.width = pct+'%';
           document.getElementById('progressLabel').textContent = label;
         });
-        const url = URL.createObjectURL(blob);
-        Object.assign(document.createElement('a'), { href:url, download:outputName }).click();
-        URL.revokeObjectURL(url);
-        document.getElementById('alertArea').innerHTML = `<div class="alert alert-success">✅ Merged ${files.length} files — downloading <strong>${outputName}</strong></div>`;
+        downloadBlob(blob, outputName);
+        const ok = document.createElement('div');
+        ok.className = 'alert alert-success';
+        ok.textContent = `✅ Merged ${files.length} files — downloading ${outputName}`;
+        document.getElementById('alertArea').replaceChildren(ok);
         await saveToHistory('pdf-merge', { fileCount: files.length, outputName, totalSizeBytes: files.reduce((s,f)=>s+f.size,0) });
       } catch (err) {
-        document.getElementById('alertArea').innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        const div = document.createElement('div');
+        div.className = 'alert alert-error';
+        div.textContent = `❌ ${err.message}`;
+        document.getElementById('alertArea').replaceChildren(div);
       } finally {
         document.getElementById('mergeBtn').disabled = false;
         document.getElementById('progressWrap').classList.add('hidden');

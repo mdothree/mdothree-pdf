@@ -47,6 +47,16 @@
   });
 })();
 
+// Keyboard access for drop zones: they are role="button" + tabindex="0" but
+// had no key handler, so Enter/Space on a focused drop zone did nothing.
+document.querySelectorAll('.drop-zone[role="button"]').forEach(function (zone) {
+  zone.addEventListener('keydown', function (e) {
+    if (e.target !== zone || (e.key !== 'Enter' && e.key !== ' ')) return;
+    var input = zone.querySelector('input[type="file"]');
+    if (input) { e.preventDefault(); input.click(); }
+  });
+});
+
 // Service worker registration (runs once per page load)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {

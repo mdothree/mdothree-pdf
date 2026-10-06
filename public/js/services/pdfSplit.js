@@ -22,7 +22,10 @@ export async function splitPDF(file, mode, options = {}, onProgress = () => {}) 
     onProgress(100, 'Done!');
 
   } else if (mode === 'each') {
-    const { default: JSZip } = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js').catch(() => ({ default: null }));
+    // dist/jszip.min.js is a UMD build with no ES default export, so importing
+    // it gave JSZip === undefined and the ZIP was never built. The +esm build
+    // exports the constructor as default.
+    const { default: JSZip } = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm').catch(() => ({ default: null }));
     const results = [];
     for (let i = 0; i < totalPages; i++) {
       const pct = Math.round(20 + (i / totalPages) * 70);
@@ -89,6 +92,8 @@ function parsePageRange(rangeStr, totalPages) {
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  // Revoking synchronously can cancel the download in Safari/Firefox.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

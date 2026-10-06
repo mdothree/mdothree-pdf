@@ -39,6 +39,7 @@
   --slate-800:  #1E293B;
   --slate-700:  #334155;
   --slate-600:  #475569;
+  --slate-500:  #7C8BA1; /* muted text: 5.8:1 on slate-950, 5.2:1 on slate-900 */
   --slate-400:  #94A3B8;
   --slate-300:  #CBD5E1;
   --slate-200:  #E2E8F0;
@@ -202,7 +203,9 @@ body::before {
 /* === Tool Grid === */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  /* Fixed 3 columns: 6 cards = 3+3, 3 cards = one full row (auto-fill gave
+     4 columns -> 4+2 orphans / an empty slot). 2 on tablet, 1 on phone below. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin: 40px 0;
 }
@@ -831,7 +834,7 @@ input[type="color"] {
 .footer-links a {
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--slate-600);
+  color: var(--slate-400); /* was slate-600: 2.7:1, fails AA */
   text-decoration: none;
   transition: color var(--transition);
 }
@@ -841,7 +844,7 @@ input[type="color"] {
 .footer-copy {
   font-family: var(--font-mono);
   font-size: 0.73rem;
-  color: var(--slate-700);
+  color: var(--slate-500); /* was slate-700: 1.95:1, fails AA */
 }
 
 
@@ -885,10 +888,17 @@ input[type="color"] {
 @media (max-width: 768px) {
   .nav-hamburger { display: flex; align-items: center; justify-content: center; }
 
+  /* Most pages put the hamburger after .nav-inner (outside it); without this
+     it wrapped onto its own row, flush left, under the logo. Keep one row. */
+  .nav { display: flex; align-items: center; padding-right: 24px; }
+  .nav-inner { flex: 1; min-width: 0; }
+  .nav-inner > .nav-hamburger { margin-left: auto; }
+  .nav > .nav-hamburger { flex-shrink: 0; }
+
   .nav-links {
     display: none;
-    position: fixed;
-    top: 57px;
+    position: absolute;
+    top: 100%;
     left: 0; right: 0;
     background: var(--slate-950);
     border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -1019,6 +1029,7 @@ input[type="color"] {
     --slate-800:  #e2e8f0;
     --slate-700:  #cbd5e1;
     --slate-600:  #94a3b8;
+    --slate-500:  #586579; /* muted text: >=5.4:1 on light surfaces */
     --slate-400:  #475569;
     --slate-300:  #334155;
     --slate-200:  #1e293b;

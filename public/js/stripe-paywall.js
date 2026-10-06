@@ -82,6 +82,10 @@ export function requirePremium(reason = 'This feature', feature = 'unknown') {
   return false;
 }
 
+// Inline onclick="requirePremium(...)" handlers in the HTML run in global
+// scope, where a module import is not visible. Expose it so they don't throw.
+if (typeof window !== 'undefined') window.requirePremium = requirePremium;
+
 // ── Stripe lazy loader ────────────────────────────────────────────────────
 
 async function _loadStripe() {

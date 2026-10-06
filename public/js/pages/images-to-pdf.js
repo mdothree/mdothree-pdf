@@ -2,7 +2,7 @@
 import { imagesToPDF } from '../services/imagesToPdf.js';
 import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
-    import { formatBytes } from '../utils/fileHandlers.js';
+    import { formatBytes, downloadBlob } from '../utils/fileHandlers.js';
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -12,6 +12,7 @@ import { saveToHistory } from '../config/firebase.js';
     const clearBtn = document.getElementById('clearBtn');
     const alertArea = document.getElementById('alertArea');
     let files = [];
+    let dragSrc = null;
 initPaywall();
 
     function renderPreviews() {
@@ -36,6 +37,16 @@ initPaywall();
         files.splice(i,1); renderPreviews();
         if (blobSrc.startsWith('blob:')) URL.revokeObjectURL(blobSrc);
       });
+        // Drag-to-reorder (the page copy promises it; same pattern as merge.js)
+        wrap.addEventListener('dragstart', e => { dragSrc = i; wrap.style.opacity = '0.4'; e.dataTransfer.effectAllowed = 'move'; });
+        wrap.addEventListener('dragend', () => { wrap.style.opacity = '1'; dragSrc = null; });
+        wrap.addEventListener('dragover', e => { if (dragSrc !== null) { e.preventDefault(); e.stopPropagation(); } });
+        wrap.addEventListener('drop', e => {
+          if (dragSrc === null) return;
+          e.preventDefault(); e.stopPropagation();
+          if (dragSrc !== i) { const m = files.splice(dragSrc, 1)[0]; files.splice(i, 0, m); }
+          dragSrc = null; renderPreviews();
+        });
         wrap.appendChild(img); wrap.appendChild(lbl); wrap.appendChild(rm);
         previewGrid.appendChild(wrap);
       });
@@ -43,12 +54,20 @@ initPaywall();
     }
 
     function addFiles(newFiles) {
-      const images = Array.from(newFiles).filter(f => f.type.startsWith('image/'));
+      const all = Array.from(newFiles);
+      const images = all.filter(f => f.type.startsWith('image/'));
+      alertArea.innerHTML = '';
+      if (images.length < all.length) {
+        const div = document.createElement('div');
+        div.className = 'alert alert-error';
+        div.textContent = `❌ ${all.length - images.length} file${all.length - images.length > 1 ? 's were' : ' was'} skipped — only image files (JPG, PNG, WebP, GIF) can be added.`;
+        alertArea.appendChild(div);
+      }
       files = [...files, ...images];
       renderPreviews();
     }
 
-    fileInput.addEventListener('change', () => addFiles(fileInput.files));
+    fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => {
@@ -70,14 +89,22 @@ initPaywall();
           document.getElementById('progressFill').style.width = pct + '%';
           document.getElementById('progressLabel').textContent = label;
         });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = outputName; a.click();
-        URL.revokeObjectURL(url);
-        alertArea.innerHTML = `<div class="alert alert-success">✅ Created PDF with ${files.length} page${files.length>1?'s':''}.</div>`;
-        await saveToHistory('images-to-pdf', { imageCount: files.length, pageSize });
+        downloadBlob(blob, /\.pdf$/i.test(outputName) ? outputName : `${outputName}.pdf`);
+        const pages = blob.pageCount ?? files.length;
+        const skipped = blob.skipped || [];
+        alertArea.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = skipped.length ? 'alert alert-info' : 'alert alert-success';
+        div.textContent = `✅ Created PDF with ${pages} page${pages > 1 ? 's' : ''}.` +
+          (skipped.length ? ` Skipped ${skipped.length} image${skipped.length > 1 ? 's' : ''} that couldn't be read: ${skipped.join(', ')}` : '');
+        alertArea.appendChild(div);
+        await saveToHistory('images-to-pdf', { imageCount: pages, pageSize });
       } catch (err) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        alertArea.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'alert alert-error';
+        div.textContent = `❌ ${err.message}`;
+        alertArea.appendChild(div);
       } finally {
         convertBtn.disabled = false;
         document.getElementById('progressWrap').classList.add('hidden');

@@ -19,10 +19,13 @@ export async function compressPDF(file, options = {}, onProgress = () => {}) {
   const { quality = 0.72, scale = 1.5, removeMetadata = true } = options;
 
   onProgress(5, 'Loading libraries…');
-  const [pdfjsLib, { PDFDocument }] = await Promise.all([
+  const [pdfjsMod, { PDFDocument }] = await Promise.all([
     import(PDFJS_CDN),
     import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm'),
   ]);
+  // The jsDelivr +esm build of pdfjs 3.x only exposes GlobalWorkerOptions on
+  // the default export (the CJS exports object), not as a named export.
+  const pdfjsLib = pdfjsMod.default ?? pdfjsMod;
   pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
 
   onProgress(12, 'Loading PDF…');

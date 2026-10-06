@@ -7,7 +7,10 @@ export async function pdfToImages(file, options = {}, onProgress = () => {}) {
   const { format = 'jpeg', quality = 0.9, scale = 2 } = options;
 
   onProgress(5, 'Loading PDF.js...');
-  const pdfjsLib = await import(PDFJS_CDN);
+  // The jsDelivr +esm build of pdfjs 3.x only exposes GlobalWorkerOptions on
+  // the default export (the CJS exports object), not as a named export.
+  const pdfjsMod = await import(PDFJS_CDN);
+  const pdfjsLib = pdfjsMod.default ?? pdfjsMod;
   pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
 
   onProgress(15, 'Loading PDF...');

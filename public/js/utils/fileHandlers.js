@@ -8,6 +8,10 @@ export function formatBytes(bytes) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+export function isPdfFile(file) {
+  return !!file && (file.type === 'application/pdf' || /\.pdf$/i.test(file.name || ''));
+}
+
 export function showAlert(container, type, message) {
   container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
 }
@@ -25,7 +29,8 @@ export function downloadBlob(blob, filename) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Revoking synchronously can cancel the download in Safari/Firefox.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function readFileAsArrayBuffer(file) {

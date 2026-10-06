@@ -2,6 +2,7 @@
 import { pdfToImages } from '../services/pdfToImages.js';
 import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
+import { isPdfFile } from '../utils/fileHandlers.js';
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -20,19 +21,24 @@ initPaywall();
     qualitySlider.addEventListener('input', () => { qualityVal.textContent = qualitySlider.value + '%'; });
 
     function loadFile(f) {
+      if (!isPdfFile(f)) {
+        alertArea.innerHTML = `<div class="alert alert-error">❌ That file isn't a PDF. Drop a .pdf file to convert it.</div>`;
+        return;
+      }
+      alertArea.innerHTML = '';
       currentFile = f;
       controls.classList.remove('hidden');
       previewGrid.innerHTML = '';
       alertArea.innerHTML = '';
     }
 
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); fileInput.value = ''; });
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => {
       e.preventDefault(); dropZone.classList.remove('dragover');
       const f = e.dataTransfer.files[0];
-      if (f?.type === 'application/pdf') loadFile(f);
+      if (f) loadFile(f);
     });
 
     convertBtn.addEventListener('click', async () => {
@@ -41,7 +47,7 @@ initPaywall();
         requirePremium(`Converting PDFs over 10MB to images requires Pro`, 'pdf-to-images-size');
         return;
       }
-      
+      convertBtn.disabled = true;
       progressWrap.classList.remove('hidden');
       previewGrid.innerHTML = '';
       alertArea.innerHTML = '';
@@ -77,7 +83,11 @@ initPaywall();
         alertArea.innerHTML = `<div class="alert alert-success">✅ Converted ${images.length} page${images.length>1?'s':''}.</div>`;
         await saveToHistory('pdf-to-images', { pages: images.length, format, scale });
       } catch (err) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        alertArea.innerHTML = '';
+        const errDiv = document.createElement('div');
+        errDiv.className = 'alert alert-error';
+        errDiv.textContent = `❌ ${err.message}`;
+        alertArea.appendChild(errDiv);
       } finally {
         convertBtn.disabled = false;
         progressWrap.classList.add('hidden');

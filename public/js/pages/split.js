@@ -2,7 +2,7 @@
 import { splitPDF } from '../services/pdfSplit.js';
 import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
-    import { formatBytes } from '../utils/fileHandlers.js';
+    import { formatBytes, isPdfFile } from '../utils/fileHandlers.js';
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -30,26 +30,45 @@ initPaywall();;
       });
     });
 
-    async function loadFile(file) {
-      currentFile = file;
-      document.getElementById('fileName').textContent = file.name;
-      document.getElementById('fileSize').textContent = formatBytes(file.size);
-      const { PDFDocument } = await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
-      const bytes = await file.arrayBuffer();
-      const pdf = await PDFDocument.load(bytes);
-      totalPages = pdf.getPageCount();
-      document.getElementById('pageCount').textContent = `${totalPages} pages`;
-      fileInfo.classList.remove('hidden');
-      controls.classList.remove('hidden');
+    function showError(msg) {
+      alertArea.innerHTML = '';
+      const div = document.createElement('div');
+      div.className = 'alert alert-error';
+      div.textContent = `❌ ${msg}`;
+      alertArea.appendChild(div);
     }
 
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+    async function loadFile(file) {
+      alertArea.innerHTML = '';
+      if (!isPdfFile(file)) { showError("That file isn't a PDF. Drop a .pdf file to split it."); return; }
+      try {
+        const { PDFDocument } = await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
+        const bytes = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(bytes);
+        currentFile = file;
+        totalPages = pdf.getPageCount();
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileSize').textContent = formatBytes(file.size);
+        document.getElementById('pageCount').textContent = `${totalPages} pages`;
+        fileInfo.classList.remove('hidden');
+        controls.classList.remove('hidden');
+      } catch (err) {
+        currentFile = null; totalPages = 0;
+        fileInfo.classList.add('hidden'); controls.classList.add('hidden');
+        const encrypted = /encrypt/i.test(err.message || '');
+        showError(encrypted
+          ? 'This PDF is password-protected. Remove the password and try again.'
+          : `Could not read this PDF: ${err.message}`);
+      }
+    }
+
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); fileInput.value = ''; });
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => {
       e.preventDefault(); dropZone.classList.remove('dragover');
       const f = e.dataTransfer.files[0];
-      if (f?.type === 'application/pdf') loadFile(f);
+      if (f) loadFile(f);
     });
 
     clearBtn.addEventListener('click', () => {
@@ -74,7 +93,7 @@ initPaywall();;
         alertArea.innerHTML = `<div class="alert alert-success">✅ Done! Check your downloads.</div>`;
         await saveToHistory('pdf-split', { mode: currentMode });
       } catch (err) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        showError(err.message);
       } finally {
         splitBtn.disabled = false;
         progressWrap.classList.add('hidden');

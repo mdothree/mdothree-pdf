@@ -2,7 +2,7 @@
 import { extractText } from '../services/textExtract.js';
 import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
-    import { formatBytes } from '../utils/fileHandlers.js';
+    import { formatBytes, isPdfFile } from '../utils/fileHandlers.js';
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -15,6 +15,11 @@ import { saveToHistory } from '../config/firebase.js';
 initPaywall();
 
     function loadFile(f) {
+      if (!isPdfFile(f)) {
+        alertArea.innerHTML = `<div class="alert alert-error">❌ That file isn't a PDF. Drop a .pdf file to extract text from it.</div>`;
+        return;
+      }
+      alertArea.innerHTML = '';
       currentFile = f;
       document.getElementById('fileName').textContent = f.name;
       document.getElementById('pageCount').textContent = formatBytes(f.size);
@@ -22,13 +27,13 @@ initPaywall();
       document.getElementById('controls').classList.remove('hidden');
     }
 
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); fileInput.value = ''; });
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
     dropZone.addEventListener('drop', e => {
       e.preventDefault(); dropZone.classList.remove('dragover');
       const f = e.dataTransfer.files[0];
-      if (f?.type === 'application/pdf') loadFile(f);
+      if (f) loadFile(f);
     });
 
     extractBtn.addEventListener('click', async () => {
@@ -37,7 +42,7 @@ initPaywall();
         requirePremium(`Extracting text from files over 10MB requires Pro`, 'pdf-extract-size');
         return;
       }
-      
+      extractBtn.disabled = true;
       document.getElementById('progressWrap').classList.remove('hidden');
       alertArea.innerHTML = '';
       textOutput.style.fontStyle = 'italic';
@@ -56,9 +61,17 @@ initPaywall();
         document.getElementById('charCount').textContent = extractedText.length.toLocaleString();
         document.getElementById('statsPanel').style.display = 'block';
         document.getElementById('outputActions').style.display = 'flex';
+        const bodyText = extractedText.replace(/^--- Page \d+ ---$/gm, '').trim();
+        if (!bodyText) {
+          alertArea.innerHTML = `<div class="alert alert-info">ℹ️ No text layer found. This looks like a scanned or image-only PDF, which needs OCR to extract text.</div>`;
+        }
         await saveToHistory('pdf-extract-text', { words, chars: extractedText.length });
       } catch (err) {
-        alertArea.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        alertArea.innerHTML = '';
+        const errDiv = document.createElement('div');
+        errDiv.className = 'alert alert-error';
+        errDiv.textContent = `❌ ${err.message}`;
+        alertArea.appendChild(errDiv);
         textOutput.textContent = 'Error during extraction.';
       } finally {
         extractBtn.disabled = false;

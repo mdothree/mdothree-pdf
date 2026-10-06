@@ -13,6 +13,7 @@ export async function imagesToPDF(files, options = {}, onProgress = () => {}) {
   const pdfDoc = await PDFDocument.create();
   const [pageW, pageH] = PAGE_SIZES[pageSize] || PAGE_SIZES.a4;
   const fitToImage = pageSize === 'fit';
+  const skipped = [];
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
@@ -24,8 +25,13 @@ export async function imagesToPDF(files, options = {}, onProgress = () => {}) {
 
     let image;
     try {
-      if (mime === 'image/jpeg' || mime === 'image/jpg') {
+      if ((mime === 'image/jpeg' || mime === 'image/jpg') && jpegOrientation(bytes) <= 1) {
         image = await pdfDoc.embedJpg(bytes);
+      } else if (mime === 'image/jpeg' || mime === 'image/jpg') {
+        // Phone photos store rotation in the EXIF Orientation tag; pdf-lib
+        // embeds raw JPEG bytes and ignores it, so portrait shots came out
+        // sideways. Decode with orientation applied and re-encode.
+        image = await pdfDoc.embedJpg(await orientedJpegBytes(file));
       } else if (mime === 'image/png') {
         image = await pdfDoc.embedPng(bytes);
       } else {
@@ -36,6 +42,7 @@ export async function imagesToPDF(files, options = {}, onProgress = () => {}) {
       }
     } catch (e) {
       console.warn(`Skipping "${file.name}":`, e.message);
+      skipped.push(file.name);
       continue;
     }
 
@@ -62,11 +69,74 @@ export async function imagesToPDF(files, options = {}, onProgress = () => {}) {
     page.drawImage(image, { x, y, width, height });
   }
 
+  if (pdfDoc.getPageCount() === 0) {
+    throw new Error('None of these images could be read. Use JPG, PNG, WebP or GIF files.');
+  }
+
   onProgress(92, 'Saving PDF...');
   const pdfBytes = await pdfDoc.save();
   onProgress(100, 'Done!');
 
-  return new Blob([pdfBytes], { type: 'application/pdf' });
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  blob.pageCount = pdfDoc.getPageCount();
+  blob.skipped = skipped;
+  return blob;
+}
+
+/**
+ * Read the EXIF Orientation tag (1-8) from JPEG bytes. Returns 1 when absent
+ * or unreadable (1 = upright, no transform needed).
+ */
+export function jpegOrientation(buffer) {
+  try {
+    const v = new DataView(buffer instanceof ArrayBuffer ? buffer : buffer.buffer);
+    if (v.getUint16(0) !== 0xFFD8) return 1;
+    let off = 2;
+    while (off + 4 <= v.byteLength) {
+      const marker = v.getUint16(off);
+      const size = v.getUint16(off + 2);
+      if (marker === 0xFFE1 && v.getUint32(off + 4) === 0x45786966) { // "Exif"
+        const tiff = off + 10;
+        const little = v.getUint16(tiff) === 0x4949;
+        const ifd = tiff + v.getUint32(tiff + 4, little);
+        const n = v.getUint16(ifd, little);
+        for (let i = 0; i < n; i++) {
+          const e = ifd + 2 + i * 12;
+          if (v.getUint16(e, little) === 0x0112) return v.getUint16(e + 8, little) || 1;
+        }
+        return 1;
+      }
+      if ((marker & 0xFF00) !== 0xFF00 || marker === 0xFFDA) return 1;
+      off += 2 + size;
+    }
+  } catch (e) { /* fall through */ }
+  return 1;
+}
+
+async function orientedJpegBytes(file) {
+  let source;
+  if (typeof createImageBitmap === 'function') {
+    try { source = await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { source = null; }
+  }
+  if (!source) {
+    // <img> decoding applies EXIF orientation in all current browsers.
+    source = await new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not decode image')); };
+      img.src = url;
+    });
+  }
+  const w = source.naturalWidth || source.width;
+  const h = source.naturalHeight || source.height;
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(source, 0, 0);
+  if (source.close) source.close();
+  const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.92));
+  if (!blob) throw new Error('Could not re-encode image');
+  return new Uint8Array(await blob.arrayBuffer());
 }
 
 function fileToDataUrl(file) {
@@ -87,6 +157,7 @@ async function dataUrlToPngBytes(dataUrl) {
       canvas.height = img.naturalHeight;
       canvas.getContext('2d').drawImage(img, 0, 0);
       canvas.toBlob(blob => {
+        if (!blob) return reject(new Error('Could not convert image'));
         blob.arrayBuffer().then(resolve).catch(reject);
       }, 'image/png');
     };
