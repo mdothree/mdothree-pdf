@@ -110,7 +110,7 @@ import { mergePDFs } from '../services/pdfMerge.js';
         ok.className = 'alert alert-success';
         ok.textContent = `✅ Merged ${files.length} files — downloading ${outputName}`;
         document.getElementById('alertArea').replaceChildren(ok);
-        await saveToHistory('pdf-merge', { fileCount: files.length, outputName, totalSizeBytes: files.reduce((s,f)=>s+f.size,0) });
+        await saveToHistory('pdf-merge', { fileCount: files.length, totalSizeBytes: files.reduce((s,f)=>s+f.size,0) }); // no user-typed file name
       } catch (err) {
         const div = document.createElement('div');
         div.className = 'alert alert-error';

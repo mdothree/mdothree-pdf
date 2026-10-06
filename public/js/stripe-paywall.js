@@ -9,8 +9,10 @@
 
 import { ENV } from './env.js';
 import { auth, db, initFirebase } from './firebase.js';
-import { getDoc, setDoc, doc, serverTimestamp }
-  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+// Firestore is read through the namespaced (compat) SDK that the pages load
+// via <script> tags (see config/firebase.js). The modular getDoc/doc API used
+// previously cannot operate on a compat Firestore instance, so the Pro check
+// always threw and fell back to free.
 
 // ── Plans (priceIds come from ENV) ────────────────────────────────────────
 
@@ -51,10 +53,13 @@ let _user    = null;
 
 export async function initPaywall() {
   try {
-    _user = await initFirebase();
-    if (!_user || !db) { _premium = false; return false; }
-    const snap = await getDoc(doc(db, 'subscriptions', _user.uid));
-    if (snap.exists()) {
+    const init = await initFirebase();
+    // initFirebase() resolves to the user (config adapter) or to a boolean
+    // (older wrapper); read the current user from auth in the latter case.
+    _user = (init && typeof init === 'object') ? init : (auth?.currentUser || null);
+    if (!_user || !_user.uid || !db) { _premium = false; return false; }
+    const snap = await db.collection('subscriptions').doc(_user.uid).get();
+    if (snap.exists) {
       const d   = snap.data();
       const exp = d.expiresAt?.toMillis?.() || 0;
       _premium  = d.status === 'active' && exp > Date.now();

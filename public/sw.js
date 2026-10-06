@@ -13,7 +13,7 @@
 
 'use strict';
 
-const CACHE_NAME = 'mdothree-v2'; // bumped: v1 pinned broken page JS cache-first
+const CACHE_NAME = 'mdothree-v3'; // bump on every JS/CSS deploy (cache-first)
 
 // Assets to pre-cache on install
 const PRECACHE = [
