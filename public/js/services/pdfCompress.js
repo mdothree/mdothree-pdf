@@ -12,8 +12,8 @@
  * Scale: 1.0 = 72 DPI (small), 1.5 = 108 DPI (balanced), 2.0 = 144 DPI (sharp)
  */
 
-const PDFJS_CDN    = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.mjs';
-const PDFJS_WORKER = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.mjs';
+const PDFJS_CDN    = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js/+esm';
+const PDFJS_WORKER = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
 export async function compressPDF(file, options = {}, onProgress = () => {}) {
   const { quality = 0.72, scale = 1.5, removeMetadata = true } = options;

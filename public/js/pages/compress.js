@@ -3,7 +3,6 @@ import { compressPDF } from '../services/pdfCompress.js';
     import { formatBytes } from '../utils/fileHandlers.js';
     import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
     import { saveToHistory } from '../config/firebase.js';
-    import { formatBytes } from '../utils/fileHandlers.js';
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -54,7 +53,7 @@ import { compressPDF } from '../services/pdfCompress.js';
         document.getElementById('savings').textContent = `-${reduction}%`;
         document.getElementById('resultPanel').style.display = 'block';
         downloadBtn.style.display = 'flex';
-        alertArea.innerHTML = \`<div class="alert alert-success">✅ Compressed! Saved \${reduction}%</div>\`;
+        alertArea.innerHTML = `<div class="alert alert-success">✅ Compressed! Saved ${reduction}%</div>`;
         await saveToHistory('pdf-compress', { originalSize: currentFile.size, compressedSize: compressedBlob.size, reduction });
       } catch (err) {
         alertArea.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
