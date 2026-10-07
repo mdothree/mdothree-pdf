@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0F172A"/>
-  <text x="16" y="22" text-anchor="middle" font-family="monospace" font-weight="bold"
-    font-size="14" fill="#10B981">m.</text>
+  <!-- mdothree icon: PDF Tools. Source; rendered by landing/scripts/seo/build_seo.py -->
+  <rect rx="6" fill="#0F172A"/>
+  <text x="16.0" y="20.3" text-anchor="middle" font-family="JetBrains Mono" font-weight="800" font-size="11.9" fill="#10B981">PDF</text>
 </svg>

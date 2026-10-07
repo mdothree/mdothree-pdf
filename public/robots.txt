@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
-Sitemap: https://pdf.mdothree.com/sitemap.xml
 
 # Disallow config/env files
 Disallow: /js/config/
 Disallow: /*.example
+
+Sitemap: https://pdf.mdothree.com/sitemap.xml
