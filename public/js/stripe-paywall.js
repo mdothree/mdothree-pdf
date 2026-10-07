@@ -9,10 +9,7 @@
 
 import { ENV } from './env.js';
 import { auth, db, initFirebase } from './config/firebase.js';
-// Firestore is read through the namespaced (compat) SDK that the pages load
-// via <script> tags (see config/firebase.js). The modular getDoc/doc API used
-// previously cannot operate on a compat Firestore instance, so the Pro check
-// always threw and fell back to free.
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ── Plans (priceIds come from ENV) ────────────────────────────────────────
 
@@ -53,25 +50,26 @@ let _user    = null;
 
 export async function initPaywall() {
   try {
-    const init = await initFirebase();
-    // initFirebase() resolves to the user (config adapter) or to a boolean
-    // (older wrapper); read the current user from auth in the latter case.
-    _user = (init && typeof init === 'object') ? init : (auth?.currentUser || null);
-    if (!_user || !_user.uid || !db) { _premium = false; return false; }
-    const snap = await db.collection('subscriptions').doc(_user.uid).get();
-    if (snap.exists) {
-      const d   = snap.data();
-      const exp = d.expiresAt?.toMillis?.() || 0;
-      _premium  = d.status === 'active' && exp > Date.now();
-    } else {
-      _premium = false;
-    }
+    _user = await initFirebase();
+    // Guests (no account, or an anonymous uid) are never Pro: a guest uid is per
+    // browser + per subdomain and the API refuses to sell Pro to one.
+    if (!_user || !_user.uid || _user.isAnonymous || !db) { _premium = false; return false; }
+    const snap = await getDoc(doc(db, 'subscriptions', _user.uid));
+    _premium = snap.exists() ? isActiveSubscription(snap.data()) : false;
     return _premium;
   } catch (e) {
     console.warn('[Paywall] initPaywall failed:', e.message);
     _premium = false;
     return false;
   }
+}
+
+// subscriptions/{uid} is written only by the Stripe webhook (mdothree-api
+// functions/stripe/webhook.js): isPro + status + currentPeriodEnd (Timestamp).
+// expiresAt is the legacy field the old client-side success page wrote.
+function isActiveSubscription(d) {
+  const end = d.currentPeriodEnd?.toMillis?.() || d.expiresAt?.toMillis?.() || 0;
+  return d.isPro === true && (d.status === 'active' || d.status === 'trialing') && end > Date.now();
 }
 
 export function isPremium() { return _premium === true; }

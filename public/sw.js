@@ -13,7 +13,7 @@
 
 'use strict';
 
-const CACHE_NAME = 'mdothree-v4'; // bump on every JS/CSS deploy (cache-first)
+const CACHE_NAME = 'mdothree-v5'; // bump on every JS/CSS deploy (cache-first)
 
 // Assets to pre-cache on install
 const PRECACHE = [
