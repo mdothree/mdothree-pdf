@@ -29,6 +29,11 @@ export const PLANS = {
   },
 };
 
+// Checkout is gated: without the flag (and its Stripe config) the upgrade
+// surface shows honest "coming soon" copy instead of a trial that leads nowhere.
+export const PRO_CHECKOUT_ENABLED = ENV.PRO_CHECKOUT_ENABLED === true
+  && !!ENV.STRIPE_PUBLISHABLE_KEY && !!ENV.FIREBASE_FUNCTION_BASE_URL;
+
 // ── Free tier limits ──────────────────────────────────────────────────────
 
 export const FREE_LIMITS = {
@@ -168,6 +173,18 @@ function _showModal(reason, feature) {
     </div>`;
 
   document.body.appendChild(overlay);
+
+  if (!PRO_CHECKOUT_ENABLED) {
+    // No live checkout yet: drop plan/price/payment UI and disable the CTA.
+    ['.pw-toggle', '#pw-price', '#pw-payment', '.pw-trust'].forEach(sel => overlay.querySelector(sel)?.remove());
+    overlay.querySelector('#pw-title').textContent = 'Pro is coming soon';
+    const ctaBtn = overlay.querySelector('#pw-cta');
+    ctaBtn.disabled = true;
+    ctaBtn.setAttribute('aria-disabled', 'true');
+    overlay.querySelector('#pw-cta-label').textContent = 'Pro coming soon';
+    overlay.querySelector('.pw-fine').textContent =
+      "Pro checkout isn't open yet, so there is nothing to buy or start today. Every free tool keeps working within the free limits.";
+  }
   document.body.style.overflow = 'hidden';
 
   // Close handlers

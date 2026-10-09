@@ -39,6 +39,9 @@ export const ENV = {
   // ── App ────────────────────────────────────────────────────
   FIREBASE_FUNCTION_BASE_URL:  getEnv('FIREBASE_FUNCTION_BASE_URL'),
   APP_ENV:                     getEnv('APP_ENV', 'production'),
+  // MDOTHREE-TRIAL-PATH-UNVERIFIED: Pro checkout stays off until the operator
+  // configures Stripe prices + the createSubscription endpoint and sets this to 'true'.
+  PRO_CHECKOUT_ENABLED:        getEnv('PRO_CHECKOUT_ENABLED') === 'true',
 };
 
 export default ENV;
