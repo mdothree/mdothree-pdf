@@ -1,15 +1,15 @@
 // pricing.js page controller
 import { initPaywall, isPremium, requirePremium, PLANS, PRO_CHECKOUT_ENABLED } from '../stripe-paywall.js';
-const TRIAL_NOTE = PRO_CHECKOUT_ENABLED ? ' · 7-day free trial' : ' · coming soon';
+const TRIAL_NOTE = PRO_CHECKOUT_ENABLED ? ' · 7-day trial' : ' · coming soon';
 
 const FAQ = [
   PRO_CHECKOUT_ENABLED
-    ? { q: 'Is there really a 7-day free trial?', a: 'Yes. You won\'t be charged for 7 days. Cancel anytime before the trial ends and you\'ll never be billed.' }
-    : { q: 'Can I buy Pro today?', a: 'Not yet. Pro checkout isn\'t open, so nothing can be charged. Every free tool works now within the free limits.' },
+    ? { q: 'How does the 7-day trial work?', a: 'You won\'t be charged for 7 days. Cancel anytime before the trial ends and you\'ll never be billed.' }
+    : { q: 'Can I buy Pro today?', a: 'Not yet. Pro checkout isn\'t open, so nothing can be charged. Every Basic tool works now within the Basic limits.' },
   { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your Account page at any time. You keep Pro access until the end of your current billing period.' },
   { q: 'Are my files safe?', a: 'All file processing happens in your browser using client-side JavaScript. Your files are never uploaded to any server — they never leave your device.' },
   { q: 'What payment methods do you accept?', a: 'All major credit and debit cards via Stripe. Apple Pay and Google Pay are also supported on supported browsers.' },
-  { q: 'What happens when I hit a free limit?', a: 'You\'ll see a prompt explaining the limit and an option to upgrade. Free tools continue to work for operations within the free tier.' },
+  { q: 'What happens when I hit a Basic limit?', a: 'You\'ll see a prompt explaining the limit and an option to upgrade. Basic tools continue to work for operations within the Basic limits.' },
   { q: 'Is there a student or non-profit discount?', a: 'Email us at hello@mdothree.com with proof of status and we\'ll sort something out.' },
 ];
 
@@ -59,7 +59,7 @@ initPaywall().then(premium => {
   } else if (PRO_CHECKOUT_ENABLED) {
     btn.disabled = false;
     btn.removeAttribute('aria-disabled');
-    btn.textContent = 'Start 7-Day Free Trial →';
+    btn.textContent = 'Start 7-Day Trial →';
     document.getElementById('proPeriod').textContent = 'per month' + TRIAL_NOTE;
     const fine = document.getElementById('proFine');
     if (fine) fine.textContent = 'No charge for 7 days. Cancel anytime.';

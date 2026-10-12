@@ -111,7 +111,7 @@ async function init() {
           cancelBtn.style.display = 'inline-flex';
         }
         if (data.trialEnd && data.trialEnd > Date.now()) {
-          planDetails.textContent = `Free trial ends ${formatExpiry(data.trialEnd)}.`;
+          planDetails.textContent = `Trial ends ${formatExpiry(data.trialEnd)}.`;
         }
       }
     } catch (_) {}
@@ -134,7 +134,7 @@ async function init() {
     subActions.appendChild(portalBtn);
 
   } else {
-    planBadge.innerHTML = `<span style="color:var(--slate-400);">Free Plan</span>`;
+    planBadge.innerHTML = `<span style="color:var(--slate-400);">Basic Plan</span>`;
     planDetails.textContent = 'Pro is coming soon: unlimited file sizes, batch processing, and more. Nothing to buy yet.';
     const upgradeBtn = document.createElement('a');
     upgradeBtn.className = 'btn btn-primary';
