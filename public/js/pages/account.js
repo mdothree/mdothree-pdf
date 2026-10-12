@@ -79,7 +79,7 @@ async function init() {
   if (!user) {
     anonState.classList.remove('hidden');
     document.getElementById('signUpBtn').addEventListener('click', () => {
-      window.location.href = 'pricing.html';
+      window.location.href = '/pricing';
     });
     return;
   }
@@ -138,7 +138,7 @@ async function init() {
     planDetails.textContent = 'Upgrade to Pro for unlimited file sizes, batch processing, and more.';
     const upgradeBtn = document.createElement('a');
     upgradeBtn.className = 'btn btn-primary';
-    upgradeBtn.href = 'pricing.html';
+    upgradeBtn.href = '/pricing';
     upgradeBtn.textContent = '✨ Upgrade to Pro →';
     subActions.appendChild(upgradeBtn);
   }

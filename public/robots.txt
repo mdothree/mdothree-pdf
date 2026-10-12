@@ -1,8 +1,7 @@
 User-agent: *
 Allow: /
 
-# Disallow config/env files
-Disallow: /js/config/
+# Disallow template files only (config modules are public by design and needed to render)
 Disallow: /*.example
 
 Sitemap: https://pdf.mdothree.com/sitemap.xml
