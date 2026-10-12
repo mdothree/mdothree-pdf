@@ -135,11 +135,11 @@ async function init() {
 
   } else {
     planBadge.innerHTML = `<span style="color:var(--slate-400);">Free Plan</span>`;
-    planDetails.textContent = 'Upgrade to Pro for unlimited file sizes, batch processing, and more.';
+    planDetails.textContent = 'Pro is coming soon: unlimited file sizes, batch processing, and more. Nothing to buy yet.';
     const upgradeBtn = document.createElement('a');
     upgradeBtn.className = 'btn btn-primary';
     upgradeBtn.href = '/pricing';
-    upgradeBtn.textContent = '✨ Upgrade to Pro →';
+    upgradeBtn.textContent = '✨ Pro (coming soon) →';
     subActions.appendChild(upgradeBtn);
   }
 
