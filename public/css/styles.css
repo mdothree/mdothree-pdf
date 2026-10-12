@@ -1023,6 +1023,9 @@ input[type="color"] {
 /* === Light Mode (respects OS preference) === */
 @media (prefers-color-scheme: light) {
   .nav-logo .dot { color: #047857; } /* A11Y-003: wordmark 5.5:1 on the light background (was #10B981 2.4:1) */
+  /* A11Y-003: emerald text/fills need >=4.5:1 on the light background */
+  :root { --emerald: #047857; --emerald-dark: #065F46; --emerald-light: #065F46; }
+  .alert-info { color: #1D4ED8; }
   :root {
     color-scheme: light dark;
     --slate-950:  #f8fafc;
@@ -1115,3 +1118,19 @@ input[type="color"] {
     background: #cbd5e1;
   }
 }
+
+/* A11Y-013: 44px-tall footer link tap targets on phones (were 20px) */
+@media (max-width: 768px) {
+  .footer-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; }
+  .breadcrumb a { display: inline-block; padding: 4px 0; }
+  input[type="range"] { min-height: 24px; }
+}
+/* A11Y-003: the "/ tool" suffix after the wordmark (inline var(--slate-600)) was 2.5-2.7:1 in both themes;
+   --slate-400 is #94A3B8 on the dark nav and #475569 on the light one */
+.nav-logo > span[style] { color: var(--slate-400) !important; }
+/* A11Y-003: breadcrumb and the pricing fine print used --slate-600 (2.5-2.7:1 in both themes) */
+.breadcrumb { color: var(--slate-400); }
+#proFine { color: var(--slate-400) !important; }
+
+/* A11Y-011: the (transparent) file input inside the drop zone takes focus; show the ring on the zone */
+.drop-zone:focus-within { outline: 2px solid var(--emerald); outline-offset: 3px; }
