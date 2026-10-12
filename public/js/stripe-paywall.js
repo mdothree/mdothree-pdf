@@ -90,9 +90,17 @@ export function requirePremium(reason = 'This feature', feature = 'unknown') {
   return false;
 }
 
-// Inline onclick="requirePremium(...)" handlers in the HTML run in global
-// scope, where a module import is not visible. Expose it so they don't throw.
+// Kept for any legacy global callers. Upgrade links in the HTML use
+// data-require-premium="<reason>" data-feature="<key>" (no inline onclick, so the CSP needs no 'unsafe-inline').
 if (typeof window !== 'undefined') window.requirePremium = requirePremium;
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('[data-require-premium]');
+    if (!a) return;
+    e.preventDefault();
+    requirePremium(a.dataset.requirePremium, a.dataset.feature || 'unknown');
+  });
+}
 
 // ── Stripe lazy loader ────────────────────────────────────────────────────
 
