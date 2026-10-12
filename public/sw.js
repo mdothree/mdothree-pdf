@@ -13,7 +13,7 @@
 
 'use strict';
 
-const CACHE_NAME = 'mdothree-v9'; // bump on every JS/CSS deploy (cache-first)
+const CACHE_NAME = 'mdothree-v10'; // bump on every JS/CSS deploy (cache-first)
 
 // Assets to pre-cache on install
 const PRECACHE = [
@@ -42,7 +42,7 @@ const CDN_HOSTS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(PRECACHE))
+      .then(cache => cache.addAll(PRECACHE.map(u => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -61,6 +61,10 @@ self.addEventListener('activate', event => {
 });
 
 // ── Fetch: serve from cache with network fallback ────────────────────────────
+// PERF-007: static assets carry a 1-day HTTP max-age, so the SW fills its cache with
+// revalidated copies (cache: 'reload' on install, 'no-cache' on a miss), never a stale HTTP-cache hit.
+const fresh = r => (r.mode === 'navigate' ? r : new Request(r, { cache: 'no-cache' }));
+
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
@@ -107,7 +111,7 @@ self.addEventListener('fetch', event => {
       caches.open(CACHE_NAME).then(cache =>
         cache.match(request).then(cached => {
           if (cached) return cached;
-          return fetch(request).then(response => {
+          return fetch(fresh(request)).then(response => {
             if (response.ok) cache.put(request, response.clone());
             return response;
           }).catch(() => new Response('Offline', { status: 503 }));
