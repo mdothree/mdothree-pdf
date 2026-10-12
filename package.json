@@ -1,7 +1,7 @@
 {
   "name": "mdothree-pdf",
   "version": "1.0.0",
-  "description": "PDF Tools \u2014 merge, split, compress, convert. Free & client-side.",
+  "description": "PDF Tools \u2014 merge, split, compress, convert. Client-side.",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,7 +1,7 @@
 {
   "name": "mdothree PDF Tools",
   "short_name": "PDF Tools",
-  "description": "Free PDF tools to merge, split, and compress PDFs, convert pages to images, and extract text. Processing is client-side, so files never leave your browser.",
+  "description": "PDF tools to merge, split, and compress PDFs, convert pages to images, and extract text. Processing is client-side, so files never leave your browser.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

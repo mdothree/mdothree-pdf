@@ -168,7 +168,7 @@ function _showModal(reason, feature) {
       </div>
 
       <button class="pw-cta" id="pw-cta">
-        <span id="pw-cta-label">Start 7-Day Free Trial →</span>
+        <span id="pw-cta-label">Start 7-Day Trial →</span>
         <span id="pw-cta-spin" class="pw-spin" style="display:none;"></span>
       </button>
       <p class="pw-fine">No charge for 7 days. Cancel before trial ends.</p>
@@ -191,7 +191,7 @@ function _showModal(reason, feature) {
     ctaBtn.setAttribute('aria-disabled', 'true');
     overlay.querySelector('#pw-cta-label').textContent = 'Pro coming soon';
     overlay.querySelector('.pw-fine').textContent =
-      "Pro checkout isn't open yet, so there is nothing to buy or start today. Every free tool keeps working within the free limits.";
+      "Pro checkout isn't open yet, so there is nothing to buy or start today. Every Basic tool keeps working within the Basic limits.";
   }
   document.body.style.overflow = 'hidden';
 
