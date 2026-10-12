@@ -1131,6 +1131,8 @@ input[type="color"] {
 /* A11Y-003: breadcrumb and the pricing fine print used --slate-600 (2.5-2.7:1 in both themes) */
 .breadcrumb { color: var(--slate-400); }
 #proFine { color: var(--slate-400) !important; }
+/* A11Y-003: inline var(--slate-600) placeholder/empty-state text (#qrPlaceholder 2.56:1 on white) */
+#qrPlaceholder, #historyEmpty { color: var(--slate-400) !important; }
 
 /* A11Y-011: the (transparent) file input inside the drop zone takes focus; show the ring on the zone */
 .drop-zone:focus-within { outline: 2px solid var(--emerald); outline-offset: 3px; }
