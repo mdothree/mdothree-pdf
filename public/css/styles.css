@@ -1026,6 +1026,9 @@ html[data-theme="light"] .nav-logo .dot { color: #047857; } /* A11Y-003: wordmar
 /* A11Y-003: emerald text/fills need >=4.5:1 on the light background */
 html[data-theme="light"] { --emerald: #047857; --emerald-dark: #065F46; --emerald-light: #065F46; }
 html[data-theme="light"] .alert-info { color: #1D4ED8; }
+/* C7B-QR-COPY axe: light theme kept the dark palette #FCA5A5/#FCD34D (1.7:1); AA on the tinted light background */
+html[data-theme="light"] .alert-error { color: #B91C1C; }
+html[data-theme="light"] .alert-warning { color: #92400E; }
 html[data-theme="light"] {
   color-scheme: light;
   --slate-950:  #f8fafc;
