@@ -33,7 +33,7 @@ import { mergePDFs } from '../services/pdfMerge.js';
           <span class="file-item-size">${formatBytes(f.size)}</span>
           <button class="file-item-remove" data-i="${i}" aria-label="Remove">✕</button>`;
         // File names are user data: set as text, never as HTML.
-        li.querySelector('.file-item-name').textContent = f.name + (oversized ? ' — exceeds Basic 10MB limit' : '');
+        li.querySelector('.file-item-name').textContent = f.name + (oversized ? ' — exceeds the 10MB limit without Pro' : '');
         fileList.appendChild(li);
       });
 
@@ -88,11 +88,11 @@ import { mergePDFs } from '../services/pdfMerge.js';
     document.getElementById('mergeBtn').addEventListener('click', async () => {
       if (files.length < 2) return;
       if (files.length > FREE_FILE_LIMIT && !isPremium()) {
-        requirePremium(`Merging ${files.length} files (Basic limit: ${FREE_FILE_LIMIT})`, 'pdf-merge-count'); return;
+        requirePremium(`Merging ${files.length} files (limit without Pro: ${FREE_FILE_LIMIT})`, 'pdf-merge-count'); return;
       }
       const oversized = files.find(f => f.size > FREE_SIZE_LIMIT);
       if (oversized && !isPremium()) {
-        requirePremium(`"${oversized.name}" is ${formatBytes(oversized.size)} — Basic limit is 10MB`, 'pdf-merge-size'); return;
+        requirePremium(`"${oversized.name}" is ${formatBytes(oversized.size)} — the limit without Pro is 10MB`, 'pdf-merge-size'); return;
       }
 
       document.getElementById('mergeBtn').disabled = true;

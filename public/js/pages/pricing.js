@@ -5,11 +5,11 @@ const TRIAL_NOTE = PRO_CHECKOUT_ENABLED ? ' · 7-day trial' : ' · coming soon';
 const FAQ = [
   PRO_CHECKOUT_ENABLED
     ? { q: 'How does the 7-day trial work?', a: 'You won\'t be charged for 7 days. Cancel anytime before the trial ends and you\'ll never be billed.' }
-    : { q: 'Can I buy Pro today?', a: 'Not yet. Pro checkout isn\'t open, so nothing can be charged. Every Basic tool works now within the Basic limits.' },
+    : { q: 'Can I buy Pro today?', a: 'Not yet. Pro checkout isn\'t open, so nothing can be charged. Every core tool works now within its standard limits.' },
   { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your Account page at any time. You keep Pro access until the end of your current billing period.' },
   { q: 'Are my files safe?', a: 'All file processing happens in your browser using client-side JavaScript. Your files are never uploaded to any server — they never leave your device.' },
   { q: 'What payment methods do you accept?', a: 'All major credit and debit cards via Stripe. Apple Pay and Google Pay are also supported on supported browsers.' },
-  { q: 'What happens when I hit a Basic limit?', a: 'You\'ll see a prompt explaining the limit and an option to upgrade. Basic tools continue to work for operations within the Basic limits.' },
+  { q: 'What happens when I hit a limit?', a: 'You\'ll see a prompt explaining the limit and an option to upgrade. The tools keep working for anything within the standard limits.' },
   { q: 'Is there a student or non-profit discount?', a: 'Email us at hello@mdothree.com with proof of status and we\'ll sort something out.' },
 ];
 
@@ -39,10 +39,10 @@ document.querySelectorAll('[data-billing]').forEach(btn => {
     btn.classList.add('active');
     billing = btn.dataset.billing;
     if (billing === 'yearly') {
-      document.getElementById('proAmount').innerHTML = '<sup>$</sup>3.33';
-      document.getElementById('proPeriod').textContent = 'per month, billed $39.99/yr' + TRIAL_NOTE;
+      document.getElementById('proAmount').innerHTML = '<sup>$</sup>3';
+      document.getElementById('proPeriod').textContent = 'per month, billed $36/yr' + TRIAL_NOTE;
     } else {
-      document.getElementById('proAmount').innerHTML = '<sup>$</sup>4.99';
+      document.getElementById('proAmount').innerHTML = '<sup>$</sup>4';
       document.getElementById('proPeriod').textContent = 'per month' + TRIAL_NOTE;
     }
   });

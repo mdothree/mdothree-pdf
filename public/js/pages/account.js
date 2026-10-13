@@ -134,7 +134,7 @@ async function init() {
     subActions.appendChild(portalBtn);
 
   } else {
-    planBadge.innerHTML = `<span style="color:var(--slate-400);">Basic Plan</span>`;
+    planBadge.innerHTML = `<span style="color:var(--slate-400);">Not on Pro</span>`;
     planDetails.textContent = 'Pro is coming soon: unlimited file sizes, batch processing, and more. Nothing to buy yet.';
     const upgradeBtn = document.createElement('a');
     upgradeBtn.className = 'btn btn-primary';

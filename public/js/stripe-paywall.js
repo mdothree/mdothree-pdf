@@ -17,15 +17,15 @@ export const PLANS = {
   monthly: {
     priceId: ENV.STRIPE_PRICE_MONTHLY,
     label:   'Pro Monthly',
-    price:   '$4.99',
+    price:   '$4',
     period:  'month',
   },
   yearly: {
     priceId: ENV.STRIPE_PRICE_YEARLY,
     label:   'Pro Yearly',
-    price:   '$39.99',
+    price:   '$36',
     period:  'year',
-    badge:   'Save 33%',
+    badge:   'Save 25%',
   },
 };
 
@@ -34,7 +34,7 @@ export const PLANS = {
 export const PRO_CHECKOUT_ENABLED = ENV.PRO_CHECKOUT_ENABLED === true
   && !!ENV.STRIPE_PUBLISHABLE_KEY && !!ENV.FIREBASE_FUNCTION_BASE_URL;
 
-// ── Free tier limits ──────────────────────────────────────────────────────
+// ── Limits without Pro ──────────────────────────────────────────────────────
 
 export const FREE_LIMITS = {
   pdfMergeFiles:  3,
@@ -143,7 +143,7 @@ function _showModal(reason, feature) {
       <div class="pw-toggle">
         <button class="pw-plan active" data-plan="monthly">Monthly</button>
         <button class="pw-plan" data-plan="yearly">
-          Yearly <span class="pw-badge">Save 33%</span>
+          Yearly <span class="pw-badge">Save 25%</span>
         </button>
       </div>
 
@@ -158,7 +158,7 @@ function _showModal(reason, feature) {
       </ul>
 
       <div class="pw-price" id="pw-price">
-        <span class="pw-amount">$4.99</span><span class="pw-period"> / month</span>
+        <span class="pw-amount">$4</span><span class="pw-period"> / month</span>
       </div>
 
       <div id="pw-payment" style="display:none;">
@@ -191,7 +191,7 @@ function _showModal(reason, feature) {
     ctaBtn.setAttribute('aria-disabled', 'true');
     overlay.querySelector('#pw-cta-label').textContent = 'Pro coming soon';
     overlay.querySelector('.pw-fine').textContent =
-      "Pro checkout isn't open yet, so there is nothing to buy or start today. Every Basic tool keeps working within the Basic limits.";
+      "Pro checkout isn't open yet, so there is nothing to buy or start today. Every core tool keeps working within its standard limits.";
   }
   document.body.style.overflow = 'hidden';
 
