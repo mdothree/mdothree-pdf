@@ -13,7 +13,7 @@
 
 'use strict';
 
-const CACHE_NAME = 'mdothree-v10'; // bump on every JS/CSS deploy (cache-first)
+const CACHE_NAME = 'mdothree-v11'; // bump on every JS/CSS deploy (cache-first)
 
 // Assets to pre-cache on install
 const PRECACHE = [
@@ -27,6 +27,10 @@ const PRECACHE = [
   '/site.webmanifest',
   '/favicon.svg',
   '/404.html',
+  '/css/site-chrome.css',
+  '/js/theme-init.js',
+  '/js/site-chrome.js',
+  '/js/auth-nav.js',
 ];
 
 // CDN resources to cache on first use

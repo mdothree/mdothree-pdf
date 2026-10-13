@@ -1020,104 +1020,104 @@ input[type="color"] {
   .panel { padding: 20px; }
 }
 
-/* === Light Mode (respects OS preference) === */
-@media (prefers-color-scheme: light) {
-  .nav-logo .dot { color: #047857; } /* A11Y-003: wordmark 5.5:1 on the light background (was #10B981 2.4:1) */
-  /* A11Y-003: emerald text/fills need >=4.5:1 on the light background */
-  :root { --emerald: #047857; --emerald-dark: #065F46; --emerald-light: #065F46; }
-  .alert-info { color: #1D4ED8; }
-  :root {
-    color-scheme: light dark;
-    --slate-950:  #f8fafc;
-    --slate-900:  #f1f5f9;
-    --slate-800:  #e2e8f0;
-    --slate-700:  #cbd5e1;
-    --slate-600:  #94a3b8;
-    --slate-500:  #586579; /* muted text: >=5.4:1 on light surfaces */
-    --slate-400:  #475569;
-    --slate-300:  #334155;
-    --slate-200:  #1e293b;
-    --slate-100:  #0f172a;
-    --white:      #0f172a;
-    --emerald-dim: rgba(16, 185, 129, 0.10);
-    --shadow-sm:  0 1px 3px rgba(0,0,0,0.12);
-    --shadow-md:  0 4px 16px rgba(0,0,0,0.1);
-  }
-
-  body::before {
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(16,185,129,0.05) 0%, transparent 60%);
-  }
-
-  .nav {
-    background: rgba(248, 250, 252, 0.9);
-    border-bottom-color: rgba(0,0,0,0.08);
-  }
-
-  .panel {
-    background: #ffffff;
-    border-color: rgba(0,0,0,0.08);
-  }
-
-  .form-input,
-  .form-select,
-  .form-textarea {
-    background: #ffffff;
-    border-color: rgba(0,0,0,0.15);
-    color: #0f172a;
-  }
-
-  .file-item {
-    background: #f1f5f9;
-    border-color: rgba(0,0,0,0.06);
-  }
-
-  .code-output {
-    background: #f8fafc;
-    border-color: rgba(0,0,0,0.08);
-    color: #1e293b;
-  }
-
-  .stat-card {
-    background: #f1f5f9;
-    border-color: rgba(0,0,0,0.06);
-  }
-
-  .tabs {
-    background: #f1f5f9;
-    border-color: rgba(0,0,0,0.06);
-  }
-
-  .drop-zone {
-    border-color: rgba(0,0,0,0.15);
-  }
-
-  .drop-zone:hover,
-  .drop-zone.dragover {
-    background: var(--emerald-dim);
-    border-color: var(--emerald);
-  }
-
-  .btn-secondary {
-    background: #e2e8f0;
-    color: #334155;
-    border-color: rgba(0,0,0,0.1);
-  }
-
-  .btn-ghost {
-    color: #475569;
-    border-color: rgba(0,0,0,0.1);
-  }
-
-  .btn-ghost:hover {
-    background: #e2e8f0;
-    color: #0f172a;
-  }
-
-  input[type="range"] {
-    background: #cbd5e1;
-  }
+/* === Light theme: html[data-theme="light"] (set before paint by /js/theme-init.js from the saved choice or the OS;
+   switched by the shared nav toggle, /js/site-chrome.js). Dark is the default palette above. === */
+html[data-theme="light"] .nav-logo .dot { color: #047857; } /* A11Y-003: wordmark 5.5:1 on the light background (was #10B981 2.4:1) */
+/* A11Y-003: emerald text/fills need >=4.5:1 on the light background */
+html[data-theme="light"] { --emerald: #047857; --emerald-dark: #065F46; --emerald-light: #065F46; }
+html[data-theme="light"] .alert-info { color: #1D4ED8; }
+html[data-theme="light"] {
+  color-scheme: light;
+  --slate-950:  #f8fafc;
+  --slate-900:  #f1f5f9;
+  --slate-800:  #e2e8f0;
+  --slate-700:  #cbd5e1;
+  --slate-600:  #94a3b8;
+  --slate-500:  #586579; /* muted text: >=5.4:1 on light surfaces */
+  --slate-400:  #475569;
+  --slate-300:  #334155;
+  --slate-200:  #1e293b;
+  --slate-100:  #0f172a;
+  --white:      #0f172a;
+  --emerald-dim: rgba(16, 185, 129, 0.10);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.1);
 }
+
+html[data-theme="light"] body::before {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(16,185,129,0.05) 0%, transparent 60%);
+}
+
+html[data-theme="light"] .nav {
+  background: rgba(248, 250, 252, 0.9);
+  border-bottom-color: rgba(0,0,0,0.08);
+}
+
+html[data-theme="light"] .panel {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.08);
+}
+
+html[data-theme="light"] .form-input,
+html[data-theme="light"] .form-select,
+html[data-theme="light"] .form-textarea {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.15);
+  color: #0f172a;
+}
+
+html[data-theme="light"] .file-item {
+  background: #f1f5f9;
+  border-color: rgba(0,0,0,0.06);
+}
+
+html[data-theme="light"] .code-output {
+  background: #f8fafc;
+  border-color: rgba(0,0,0,0.08);
+  color: #1e293b;
+}
+
+html[data-theme="light"] .stat-card {
+  background: #f1f5f9;
+  border-color: rgba(0,0,0,0.06);
+}
+
+html[data-theme="light"] .tabs {
+  background: #f1f5f9;
+  border-color: rgba(0,0,0,0.06);
+}
+
+html[data-theme="light"] .drop-zone {
+  border-color: rgba(0,0,0,0.15);
+}
+
+html[data-theme="light"] .drop-zone:hover,
+html[data-theme="light"] .drop-zone.dragover {
+  background: var(--emerald-dim);
+  border-color: var(--emerald);
+}
+
+html[data-theme="light"] .btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+  border-color: rgba(0,0,0,0.1);
+}
+
+html[data-theme="light"] .btn-ghost {
+  color: #475569;
+  border-color: rgba(0,0,0,0.1);
+}
+
+html[data-theme="light"] .btn-ghost:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+html[data-theme="light"] input[type="range"] {
+  background: #cbd5e1;
+}
+
 
 /* A11Y-013: 44px-tall footer link tap targets on phones (were 20px) */
 @media (max-width: 768px) {
@@ -1136,3 +1136,24 @@ input[type="color"] {
 
 /* A11Y-011: the (transparent) file input inside the drop zone takes focus; show the ring on the zone */
 .drop-zone:focus-within { outline: 2px solid var(--emerald); outline-offset: 3px; }
+
+/* === MDOThree shared nav template (shared/mdothree/site-chrome.*): the right-hand cluster
+   [Pro (coming soon)] [account] [menu (phones)] [theme toggle] sits at the end of .nav-inner. === */
+.nav-inner { gap: 16px; }
+.nav-inner .nav-links { margin-left: auto; }
+.nav-inner .nav-links + .mdo-actions { margin-left: 4px; }
+.mdo-actions .nav-hamburger {
+  width: 44px; height: 44px; padding: 0;
+  border: 1.5px solid var(--slate-700); border-radius: 10px;
+  background: transparent; color: var(--slate-200); font-size: 1.1rem;
+}
+.mdo-actions .nav-hamburger:hover { background: var(--slate-800); color: var(--white); }
+.mdo-actions .nav-hamburger:focus-visible { outline: 3px solid var(--emerald); outline-offset: 2px; }
+@media (max-width: 768px) {
+  .nav { padding-right: 0; }
+  .nav-inner { padding: 0 16px; gap: 10px; }
+  .mdo-actions .nav-hamburger { display: inline-flex; align-items: center; justify-content: center; }
+}
+@media (max-width: 420px) {
+  .nav-logo > span[style] { display: none; }   /* the "/ tool" suffix: the page title already names the tool */
+}

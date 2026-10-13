@@ -12,7 +12,7 @@
       font-family: var(--font-mono);
       font-size: clamp(5rem, 18vw, 10rem);
       font-weight: 500;
-      color: var(--slate-800);
+      color: var(--slate-500); /* visual gate: large text >= 3:1 in both themes (was --slate-800, 1.2-1.4:1) */
       line-height: 1;
       margin-bottom: 8px;
       letter-spacing: -0.04em;
