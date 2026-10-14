@@ -1,7 +1,6 @@
 // account.js page controller
-import { initPaywall, isPremium, openBillingPortal } from '../stripe-paywall.js';
+import { initPaywall, isPremium, openBillingPortal, subscriptionInfo } from '../stripe-paywall.js';
 import { initFirebase, getHistory, auth } from '../config/firebase.js';
-import { ENV } from '../env.js';
 
 const loadingState   = document.getElementById('loadingState');
 const anonState      = document.getElementById('anonState');
@@ -76,7 +75,7 @@ async function init() {
 
   loadingState.classList.add('hidden');
 
-  if (!user) {
+  if (!user || user.isAnonymous) {
     anonState.classList.remove('hidden');
     document.getElementById('signUpBtn').addEventListener('click', () => {
       window.location.href = '/pricing';
@@ -95,26 +94,14 @@ async function init() {
   if (premium) {
     planBadge.innerHTML = `<span style="color:var(--emerald);font-size:1.3rem;">✨</span> <span style="color:var(--emerald);">Pro</span>`;
 
-    // Fetch live status from server
-    try {
-      const idToken = await user.getIdToken();
-      const res = await fetch(`${ENV.FIREBASE_FUNCTION_BASE_URL}/getSubscriptionStatus`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.cancelAtPeriodEnd && data.expiresAt) {
-          planDetails.textContent = `Cancels ${formatExpiry(data.expiresAt)} — you keep access until then.`;
-        } else if (data.expiresAt) {
-          planDetails.textContent = `Renews ${formatExpiry(data.expiresAt)}.`;
-          cancelBtn.style.display = 'inline-flex';
-        }
-        if (data.trialEnd && data.trialEnd > Date.now()) {
-          planDetails.textContent = `Trial ends ${formatExpiry(data.trialEnd)}.`;
-        }
-      }
-    } catch (_) {}
+    // Renewal facts come from the webhook-written subscriptions/{uid} doc (read by initPaywall).
+    const info = subscriptionInfo();
+    if (info && info.cancelAtPeriodEnd && info.periodEnd) {
+      planDetails.textContent = `Cancels ${formatExpiry(info.periodEnd)}. You keep access until then.`;
+    } else if (info && info.periodEnd) {
+      planDetails.textContent = `Renews ${formatExpiry(info.periodEnd)}.`;
+      cancelBtn.style.display = 'inline-flex';
+    }
 
     // Billing portal button
     const portalBtn = document.createElement('button');
@@ -143,24 +130,13 @@ async function init() {
     subActions.appendChild(upgradeBtn);
   }
 
-  // Cancel button
+  // Cancel button: cancellation happens in the Stripe Customer Portal
+  // (createBillingPortalSession); the webhook then records cancelAtPeriodEnd.
   cancelBtn.addEventListener('click', async () => {
-    if (!confirm('Cancel your Pro subscription? You\'ll keep access until the end of your billing period.')) return;
     cancelBtn.disabled = true;
-    cancelBtn.textContent = 'Canceling...';
+    cancelBtn.textContent = 'Opening billing...';
     try {
-      const idToken = await user.getIdToken();
-      const res = await fetch(`${ENV.FIREBASE_FUNCTION_BASE_URL}/cancelSubscription`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showAlert('success', '✅ Subscription canceled. You keep Pro access until your billing period ends.');
-        cancelBtn.style.display = 'none';
-      } else {
-        throw new Error(data.error || 'Cancellation failed');
-      }
+      await openBillingPortal(window.location.href);
     } catch (e) {
       showAlert('error', '❌ ' + e.message);
       cancelBtn.disabled = false;

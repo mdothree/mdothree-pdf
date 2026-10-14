@@ -10,6 +10,9 @@
 import { ENV } from './env.js';
 import { auth, db, initFirebase } from './config/firebase.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+// mdothree-api client: Bearer <Firebase ID token>, guests refused, no uid in bodies,
+// {success:false,error,code} mapped to honest messages (hardened API 883dbfc).
+import { createSubscription, createPortal, signedInUser, ProApiError, proErrorMessage } from './pro-api.js';
 
 // ── Plans (priceIds come from ENV) ────────────────────────────────────────
 
@@ -50,6 +53,7 @@ export const FREE_LIMITS = {
 let _premium = null;
 let _stripe  = null;
 let _user    = null;
+let _sub     = null;   // subscriptions/{uid} as last read (webhook-written)
 
 // ── Init ──────────────────────────────────────────────────────────────────
 
@@ -58,9 +62,10 @@ export async function initPaywall() {
     _user = await initFirebase();
     // Guests (no account, or an anonymous uid) are never Pro: a guest uid is per
     // browser + per subdomain and the API refuses to sell Pro to one.
-    if (!_user || !_user.uid || _user.isAnonymous || !db) { _premium = false; return false; }
+    if (!_user || !_user.uid || _user.isAnonymous || !db) { _premium = false; _sub = null; return false; }
     const snap = await getDoc(doc(db, 'subscriptions', _user.uid));
-    _premium = snap.exists() ? isActiveSubscription(snap.data()) : false;
+    _sub = snap.exists() ? snap.data() : null;
+    _premium = _sub ? isActiveSubscription(_sub) : false;
     return _premium;
   } catch (e) {
     console.warn('[Paywall] initPaywall failed:', e.message);
@@ -78,6 +83,15 @@ function isActiveSubscription(d) {
 }
 
 export function isPremium() { return _premium === true; }
+
+/** Renewal facts from the webhook-written doc (no API call): { periodEnd: ms|0, cancelAtPeriodEnd }. */
+export function subscriptionInfo() {
+  if (!_sub) return null;
+  return {
+    periodEnd: _sub.currentPeriodEnd?.toMillis?.() || 0,
+    cancelAtPeriodEnd: _sub.cancelAtPeriodEnd === true,
+  };
+}
 
 /**
  * Gate a premium action. Returns true if allowed, false + shows modal if not.
@@ -168,10 +182,10 @@ function _showModal(reason, feature) {
       </div>
 
       <button class="pw-cta" id="pw-cta">
-        <span id="pw-cta-label">Start 7-Day Trial →</span>
+        <span id="pw-cta-label">Subscribe →</span>
         <span id="pw-cta-spin" class="pw-spin" style="display:none;"></span>
       </button>
-      <p class="pw-fine">No charge for 7 days. Cancel before trial ends.</p>
+      <p class="pw-fine" id="pw-fine" role="status">Billed today. Cancel anytime from Manage billing.</p>
 
       <div class="pw-trust">
         <span>🔒 SSL encrypted</span>
@@ -219,6 +233,12 @@ function _showModal(reason, feature) {
 
   document.getElementById('pw-cta').addEventListener('click', async () => {
     if (step === 'cta') {
+      // Pro belongs to a signed-in account: never take a card from a guest (the API would 401/403).
+      if (!signedInUser(auth)) {
+        document.getElementById('pw-fine').textContent = proErrorMessage(401, 'sign_in_required');
+        document.getElementById('pw-cta-label').textContent = 'Sign in to subscribe';
+        return;
+      }
       step = 'payment';
       document.getElementById('pw-cta-label').textContent = 'Pay & Activate';
       document.getElementById('pw-payment').style.display = 'block';
@@ -264,29 +284,21 @@ function _showModal(reason, feature) {
         });
         if (error) throw new Error(error.message);
 
-        const res = await fetch(`${ENV.FIREBASE_FUNCTION_BASE_URL}/createSubscription`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({
-            paymentMethodId: paymentMethod.id,
-            priceId:         PLANS[selectedPlan].priceId,
-            uid:             _user?.uid,
-            feature,
-          }),
-        });
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).message || 'Payment failed');
-        const result = await res.json();
+        const result = await createSubscription(paymentMethod.id, selectedPlan,
+          { baseUrl: ENV.FIREBASE_FUNCTION_BASE_URL, auth });
 
         if (result.requiresAction) {
           const { error: ce } = await _stripe.confirmCardPayment(result.clientSecret);
           if (ce) throw new Error(ce.message);
         }
 
-        _premium = true;
-        _showSuccess();
-        setTimeout(_removeModal, 2500);
+        // Pro is granted only by the Stripe webhook: show what is true, then confirm it.
+        _showSuccess(false, true);
+        const active = await _waitForPro();
+        _showSuccess(active, false);
+        if (active) setTimeout(_removeModal, 2500);
       } catch (err) {
-        document.getElementById('pw-card-error').textContent = '❌ ' + err.message;
+        document.getElementById('pw-card-error').textContent = '❌ ' + (err instanceof ProApiError ? err.message : (err?.message || proErrorMessage(500, 'internal')));
         step = 'payment';
         document.getElementById('pw-cta-label').style.display = 'inline';
         document.getElementById('pw-cta-spin').style.display  = 'none';
@@ -296,15 +308,31 @@ function _showModal(reason, feature) {
   });
 }
 
-function _showSuccess() {
+async function _waitForPro(tries = 8, everyMs = 2500) {
+  for (let i = 0; i < tries; i++) {
+    await new Promise(r => setTimeout(r, everyMs));
+    if (await initPaywall()) return true;
+  }
+  return false;
+}
+
+function _showSuccess(active, checking) {
   const m = document.getElementById('pw-modal');
   if (!m) return;
+  const title = active ? 'Pro is active' : 'Payment received, activating…';
+  const body = active
+    ? 'All Pro features are unlocked on this account.'
+    : checking
+      ? 'Waiting for Stripe to confirm the payment. This usually takes under a minute.'
+      : "Pro turns on as soon as Stripe confirms the payment. Reload this page in a minute. If it still isn't on after 10 minutes, contact hello@mdothree.com.";
   m.innerHTML = `
-    <div style="text-align:center;padding:56px 24px;">
-      <div style="font-size:3rem;margin-bottom:16px;">🎉</div>
-      <h2 style="font-family:'DM Mono',monospace;color:#10B981;font-size:1.4rem;margin-bottom:8px;">You're Pro!</h2>
-      <p style="color:#94A3B8;">All features unlocked. Enjoy!</p>
+    <div style="text-align:center;padding:56px 24px;" role="status">
+      <div style="font-size:3rem;margin-bottom:16px;">${active ? '🎉' : '⏳'}</div>
+      <h2 style="font-family:'DM Mono',monospace;color:#10B981;font-size:1.4rem;margin-bottom:8px;">${title}</h2>
+      <p style="color:#94A3B8;">${body}</p>
+      ${checking ? '' : '<button class="pw-cta" id="pw-done" style="margin-top:20px;">Close</button>'}
     </div>`;
+  document.getElementById('pw-done')?.addEventListener('click', _removeModal);
 }
 
 function _removeModal() {
@@ -413,14 +441,7 @@ function _injectStyles() {
  * Call from an account/billing page.
  */
 export async function openBillingPortal(returnUrl = window.location.href) {
-  if (!_user) throw new Error('Not authenticated');
-  const idToken = await _user.getIdToken();
-  const res = await fetch(`${ENV.FIREBASE_FUNCTION_BASE_URL}/createBillingPortalSession`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-    body: JSON.stringify({ returnUrl }),
-  });
-  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Failed to open billing portal');
-  const { url } = await res.json();
+  await initFirebase();
+  const url = await createPortal(returnUrl, { baseUrl: ENV.FIREBASE_FUNCTION_BASE_URL, auth });
   window.location.href = url;
 }

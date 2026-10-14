@@ -13,7 +13,7 @@
 
 'use strict';
 
-const CACHE_NAME = 'mdothree-v12'; // bump on every JS/CSS deploy (cache-first)
+const CACHE_NAME = 'mdothree-v13'; // bump on every JS/CSS deploy (cache-first)
 
 // Assets to pre-cache on install
 const PRECACHE = [
@@ -23,6 +23,7 @@ const PRECACHE = [
   '/js/env.js',
   '/js/nav-toggle.js',
   '/js/stripe-paywall.js',
+  '/js/pro-api.js',
   '/js/config/firebase.js',
   '/site.webmanifest',
   '/favicon.svg',
