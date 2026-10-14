@@ -17,7 +17,11 @@ export async function mergePDFs(files, onProgress = () => {}) {
     try {
       srcPdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
     } catch (e) {
-      throw new Error(`Could not read "${file.name}": ${e.message}`);
+      // HID-002: an honest message, not the parser's internals (line/col/offset).
+      const encrypted = /encrypt|password/i.test(e && e.message || '');
+      throw new Error(encrypted
+        ? `Could not read "${file.name}" — it is password-protected. Remove the password and try again.`
+        : `Could not read "${file.name}" — the PDF looks damaged or incomplete. Try re-saving or re-exporting it, then merge again.`);
     }
 
     const pages = await mergedPdf.copyPages(srcPdf, srcPdf.getPageIndices());

@@ -1,6 +1,6 @@
 // Page controller: merge.html
 import { mergePDFs } from '../services/pdfMerge.js';
-    import { formatBytes, isPdfFile, downloadBlob } from '../utils/fileHandlers.js';
+    import { formatBytes, isPdfFile, looksLikePdf, downloadBlob } from '../utils/fileHandlers.js';
     import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
     import { saveToHistory } from '../config/firebase.js';
 
@@ -62,17 +62,32 @@ import { mergePDFs } from '../services/pdfMerge.js';
       document.getElementById('proCard').classList.toggle('hidden', !over);
     }
 
-    function addFiles(newFiles) {
+    function alertDiv(kind, text) {
+      const div = document.createElement('div');
+      div.className = `alert alert-${kind}`;
+      div.textContent = text;
+      return div;
+    }
+
+    // HID-002: check each file's PDF header before it joins the list, so empty or fake files are refused
+    // up front with a plain message instead of failing at Merge with parser internals.
+    async function addFiles(newFiles) {
       const all = Array.from(newFiles);
-      const pdfs = all.filter(isPdfFile);
+      const named = all.filter(isPdfFile);
       const alertArea = document.getElementById('alertArea');
       alertArea.innerHTML = '';
-      if (pdfs.length < all.length) {
-        const div = document.createElement('div');
-        div.className = 'alert alert-error';
-        div.textContent = `❌ ${all.length - pdfs.length} file${all.length - pdfs.length > 1 ? 's were' : ' was'} skipped — only PDF files can be merged.`;
-        alertArea.appendChild(div);
+      const checks = await Promise.all(named.map(looksLikePdf));
+      const pdfs = named.filter((_, i) => checks[i]);
+      const notPdfNames = all.length - named.length;
+      const badPdfs = named.filter((_, i) => !checks[i]);
+      if (notPdfNames) {
+        alertArea.appendChild(alertDiv('error', `❌ ${notPdfNames} file${notPdfNames > 1 ? 's were' : ' was'} skipped — only PDF files can be merged.`));
       }
+      badPdfs.forEach(f => {
+        alertArea.appendChild(alertDiv('error', f.size
+          ? `❌ "${f.name}" was skipped — it isn't a readable PDF (no PDF header). It may be another file type renamed to .pdf.`
+          : `❌ "${f.name}" was skipped — the file is empty.`));
+      });
       files = [...files, ...pdfs];
       renderList();
     }
@@ -112,10 +127,7 @@ import { mergePDFs } from '../services/pdfMerge.js';
         document.getElementById('alertArea').replaceChildren(ok);
         await saveToHistory('pdf-merge', { fileCount: files.length, totalSizeBytes: files.reduce((s,f)=>s+f.size,0) }); // no user-typed file name
       } catch (err) {
-        const div = document.createElement('div');
-        div.className = 'alert alert-error';
-        div.textContent = `❌ ${err.message}`;
-        document.getElementById('alertArea').replaceChildren(div);
+        document.getElementById('alertArea').replaceChildren(alertDiv('error', `❌ ${err.message}`));
       } finally {
         document.getElementById('mergeBtn').disabled = false;
         document.getElementById('progressWrap').classList.add('hidden');

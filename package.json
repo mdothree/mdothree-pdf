@@ -9,7 +9,7 @@
     "preview": "npx serve public -p 3000",
     "lint": "npx eslint public/js/**/*.js --ext .js",
     "lint:fix": "npx eslint public/js/**/*.js --ext .js --fix",
-    "test": "node --test tests/shared-parity.test.mjs",
+    "test": "node --test tests/shared-parity.test.mjs tests/pdf-header.test.mjs",
     "deploy": "vercel --prod"
   },
   "devDependencies": {

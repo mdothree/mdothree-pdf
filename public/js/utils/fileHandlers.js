@@ -12,6 +12,27 @@ export function isPdfFile(file) {
   return !!file && (file.type === 'application/pdf' || /\.pdf$/i.test(file.name || ''));
 }
 
+// HID-002: a real PDF starts with "%PDF-" (the spec allows up to 1024 leading bytes before it).
+// Pure check on bytes so it can be unit-tested without a browser.
+export function hasPdfHeader(bytes) {
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || []);
+  const n = Math.min(u8.length, 1024) - 5;
+  for (let i = 0; i <= n; i++) {
+    if (u8[i] === 0x25 && u8[i + 1] === 0x50 && u8[i + 2] === 0x44 && u8[i + 3] === 0x46 && u8[i + 4] === 0x2d) return true;
+  }
+  return false;
+}
+
+// Reads the first 1 KB of a File/Blob and checks the PDF header. Empty files are not PDFs.
+export async function looksLikePdf(file) {
+  if (!file || !file.size) return false;
+  try {
+    return hasPdfHeader(new Uint8Array(await file.slice(0, 1024).arrayBuffer()));
+  } catch {
+    return false;
+  }
+}
+
 export function showAlert(container, type, message) {
   container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
 }
