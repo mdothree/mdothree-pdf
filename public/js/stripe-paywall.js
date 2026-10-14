@@ -235,9 +235,16 @@ function _showModal(reason, feature) {
     if (step === 'cta') {
       // Pro belongs to a signed-in account: never take a card from a guest (the API would 401/403).
       if (!signedInUser(auth)) {
-        document.getElementById('pw-fine').textContent = proErrorMessage(401, 'sign_in_required');
-        document.getElementById('pw-cta-label').textContent = 'Sign in to subscribe';
-        return;
+        // Sign in or create an account first (js/auth-ui.js, loaded now), then continue to payment.
+        const { openSignIn } = await import('./auth-nav.js');
+        const signed = await openSignIn({ reason: 'Pro belongs to your mdothree account. Sign in or create one, then continue to payment.' }).catch(() => null);
+        if (!signed || !signedInUser(auth)) {
+          document.getElementById('pw-fine').textContent = proErrorMessage(401, 'sign_in_required');
+          document.getElementById('pw-cta-label').textContent = 'Sign in to subscribe';
+          return;
+        }
+        if (await initPaywall()) { _showSuccess(true, false); return; }   // this account already has Pro
+        document.getElementById('pw-fine').textContent = 'Billed today. Cancel anytime from Manage billing.';
       }
       step = 'payment';
       document.getElementById('pw-cta-label').textContent = 'Pay & Activate';

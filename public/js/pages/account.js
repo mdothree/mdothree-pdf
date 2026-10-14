@@ -1,5 +1,5 @@
 // account.js page controller
-import { initPaywall, isPremium, openBillingPortal, subscriptionInfo } from '../stripe-paywall.js';
+import { initPaywall, isPremium, openBillingPortal, subscriptionInfo, PRO_CHECKOUT_ENABLED } from '../stripe-paywall.js';
 import { initFirebase, getHistory, auth } from '../config/firebase.js';
 
 const loadingState   = document.getElementById('loadingState');
@@ -77,7 +77,21 @@ async function init() {
 
   if (!user || user.isAnonymous) {
     anonState.classList.remove('hidden');
-    document.getElementById('signUpBtn').addEventListener('click', () => {
+    const signUpBtn = document.getElementById('signUpBtn');
+    if (PRO_CHECKOUT_ENABLED) {
+      // Sign-in opens with Pro checkout (#66b). Until then this card keeps its "coming soon" copy.
+      const h = anonState.querySelector('h2'); const p = anonState.querySelector('p');
+      if (h) h.textContent = 'Sign in to your account';
+      if (p) p.textContent = 'Sign in or create an mdothree account to manage Pro and billing. One account works on every mdothree tool.';
+      signUpBtn.textContent = 'Sign in or create an account';
+      signUpBtn.addEventListener('click', async () => {
+        const { openSignIn } = await import('../auth-nav.js');
+        const signed = await openSignIn().catch(() => null);
+        if (signed) window.location.reload();
+      });
+      return;
+    }
+    signUpBtn.addEventListener('click', () => {
       window.location.href = '/pricing';
     });
     return;

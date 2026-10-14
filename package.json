@@ -9,7 +9,7 @@
     "preview": "npx serve public -p 3000",
     "lint": "npx eslint public/js/**/*.js --ext .js",
     "lint:fix": "npx eslint public/js/**/*.js --ext .js --fix",
-    "test": "echo 'No automated tests yet \u2014 see CONTRIBUTING.md'",
+    "test": "node --test tests/shared-parity.test.mjs",
     "deploy": "vercel --prod"
   },
   "devDependencies": {

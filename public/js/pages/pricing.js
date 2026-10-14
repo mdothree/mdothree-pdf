@@ -1,10 +1,11 @@
 // pricing.js page controller
 import { initPaywall, isPremium, requirePremium, PLANS, PRO_CHECKOUT_ENABLED } from '../stripe-paywall.js';
-const TRIAL_NOTE = PRO_CHECKOUT_ENABLED ? ' · 7-day trial' : ' · coming soon';
+// No trial: the hardened API sells the $4/$36 prices only and bills on subscribe.
+const TRIAL_NOTE = PRO_CHECKOUT_ENABLED ? ' · cancel anytime' : ' · coming soon';
 
 const FAQ = [
   PRO_CHECKOUT_ENABLED
-    ? { q: 'How does the 7-day trial work?', a: 'You won\'t be charged for 7 days. Cancel anytime before the trial ends and you\'ll never be billed.' }
+    ? { q: 'When am I billed?', a: 'When you subscribe: $4 a month, or $36 a year. Cancel anytime from your Account page and you keep Pro until the end of the period you paid for.' }
     : { q: 'Can I buy Pro today?', a: 'Not yet. Pro checkout isn\'t open, so nothing can be charged. Every core tool works now within its standard limits.' },
   { q: 'Can I cancel anytime?', a: 'Absolutely. Cancel from your Account page at any time. You keep Pro access until the end of your current billing period.' },
   { q: 'Are my files safe?', a: 'All file processing happens in your browser using client-side JavaScript. Your files are never uploaded to any server — they never leave your device.' },
@@ -59,10 +60,10 @@ initPaywall().then(premium => {
   } else if (PRO_CHECKOUT_ENABLED) {
     btn.disabled = false;
     btn.removeAttribute('aria-disabled');
-    btn.textContent = 'Start 7-Day Trial →';
+    btn.textContent = 'Get Pro →';
     document.getElementById('proPeriod').textContent = 'per month' + TRIAL_NOTE;
     const fine = document.getElementById('proFine');
-    if (fine) fine.textContent = 'No charge for 7 days. Cancel anytime.';
+    if (fine) fine.textContent = 'Billed today. Cancel anytime. Sign in or create an account at checkout.';
     btn.addEventListener('click', () => {
       requirePremium('Upgrade to Pro for unlimited access', `pricing-${billing}`);
     });
