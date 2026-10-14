@@ -7,6 +7,9 @@
 //    opens /pricing and signed-out visitors get a "Sign in" button that opens js/auth-ui.js.
 //  - A real (non-anonymous) Firebase user gets the account menu: Your account (/account) + Sign out.
 //  - openSignIn() is the one entry point the Pro / account UI uses; auth-ui.js loads only when it is called.
+//  - PERF-008: the Firebase SDK is not loaded for the nav on a first visit. With no session in this
+//    browser the nav shows "signed out" at once and attaches to auth when the SDK loads later
+//    (sign-in, Pro modal, account page).
 import { ENV } from './env.js';
 
 const chromeReady = () => window.mdoChrome
@@ -17,7 +20,7 @@ export const checkoutOn = ENV.PRO_CHECKOUT_ENABLED === true && !!ENV.STRIPE_PUBL
 
 async function getAuthInstance() {
   const fb = await import('./config/firebase.js');
-  await fb.initFirebase();
+  await fb.initFirebase({ force: true });
   return fb.auth;
 }
 
@@ -33,19 +36,19 @@ export async function openSignIn(opts = {}) {
 chromeReady().then(async chrome => {
   if (checkoutOn) chrome.setCheckout({ enabled: true, href: '/pricing' });
   const signedOutOpts = checkoutOn ? { signIn: () => openSignIn() } : {};
-  try {
-    const [{ initFirebase }, { onAuthStateChanged, signOut }] = await Promise.all([
-      import('./config/firebase.js'),
-      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'),
-    ]);
-    await initFirebase();
-    const { auth } = await import('./config/firebase.js');
-    if (!auth) { chrome.setUser(null); return; }
+  const attach = async auth => {
+    const { onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     onAuthStateChanged(auth, u => chrome.setUser(u && !u.isAnonymous ? u : null, {
       ...signedOutOpts,
       signOut: () => signOut(auth),
       accountHref: '/account',
     }));
+  };
+  try {
+    const fb = await import('./config/firebase.js');
+    await fb.initFirebase();          // loads the SDK only when a session may exist here
+    if (!fb.auth) chrome.setUser(null, signedOutOpts);
+    fb.onFirebaseReady(a => attach(a).catch(() => chrome.setUser(null, signedOutOpts)));
   } catch (e) {
     chrome.setUser(null);   // Firebase unreachable: signed out, tools keep working
   }

@@ -8,8 +8,8 @@
  */
 
 import { ENV } from './env.js';
-import { auth, db, initFirebase } from './config/firebase.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+// PERF-008: no static Firebase SDK import; config/firebase.js loads it on demand.
+import { auth, db, initFirebase, getDocData } from './config/firebase.js';
 // mdothree-api client: Bearer <Firebase ID token>, guests refused, no uid in bodies,
 // {success:false,error,code} mapped to honest messages (hardened API 883dbfc).
 import { createSubscription, createPortal, signedInUser, ProApiError, proErrorMessage } from './pro-api.js';
@@ -63,8 +63,7 @@ export async function initPaywall() {
     // Guests (no account, or an anonymous uid) are never Pro: a guest uid is per
     // browser + per subdomain and the API refuses to sell Pro to one.
     if (!_user || !_user.uid || _user.isAnonymous || !db) { _premium = false; _sub = null; return false; }
-    const snap = await getDoc(doc(db, 'subscriptions', _user.uid));
-    _sub = snap.exists() ? snap.data() : null;
+    _sub = await getDocData('subscriptions', _user.uid);
     _premium = _sub ? isActiveSubscription(_sub) : false;
     return _premium;
   } catch (e) {
@@ -136,6 +135,7 @@ async function _loadStripe() {
 // ── Modal ─────────────────────────────────────────────────────────────────
 
 function _showModal(reason, feature) {
+  initFirebase({ force: true });   // PERF-008: the Pro UI is where the SDK loads on demand
   _removeModal();
   _injectStyles();
 
@@ -448,7 +448,7 @@ function _injectStyles() {
  * Call from an account/billing page.
  */
 export async function openBillingPortal(returnUrl = window.location.href) {
-  await initFirebase();
+  await initFirebase({ force: true });
   const url = await createPortal(returnUrl, { baseUrl: ENV.FIREBASE_FUNCTION_BASE_URL, auth });
   window.location.href = url;
 }

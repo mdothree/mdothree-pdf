@@ -71,7 +71,7 @@ async function loadHistory() {
 }
 
 async function init() {
-  const [user, premium] = await Promise.all([initFirebase(), initPaywall()]);
+  const [user, premium] = await Promise.all([initFirebase({ force: true }), initPaywall()])   // PERF-008: the account UI loads the SDK;
 
   loadingState.classList.add('hidden');
 
