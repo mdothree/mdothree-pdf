@@ -1,6 +1,6 @@
 // Page controller: pdf-to-images.html
 import { pdfToImages } from '../services/pdfToImages.js';
-import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
 import { isPdfFile } from '../utils/fileHandlers.js';
 
@@ -43,7 +43,7 @@ initPaywall();
 
     convertBtn.addEventListener('click', async () => {
       if (!currentFile) return;
-      if (currentFile && currentFile.size > FREE_LIMITS.pdfFileSizeMB * 1024 * 1024 && !isPremium()) {
+      if (currentFile && currentFile.size > OPEN_LIMITS.pdfFileSizeMB * 1024 * 1024 && !isPremium()) {
         requirePremium(`Converting PDFs over 10MB to images requires Pro`, 'pdf-to-images-size');
         return;
       }
@@ -62,7 +62,7 @@ initPaywall();
 
         images.forEach((dataUrl, i) => {
           const wrap = document.createElement('div');
-          wrap.style.cssText = 'background:var(--slate-800);border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;';
+          wrap.style.cssText = 'background:var(--slate-800);border:1px solid rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;';
           const img = document.createElement('img');
           img.src = dataUrl;
           img.style.cssText = 'width:100%;display:block;';

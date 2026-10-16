@@ -1,11 +1,11 @@
 // Page controller: merge.html
 import { mergePDFs } from '../services/pdfMerge.js';
     import { formatBytes, isPdfFile, looksLikePdf, downloadBlob } from '../utils/fileHandlers.js';
-    import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+    import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
     import { saveToHistory } from '../config/firebase.js';
 
-    const FREE_FILE_LIMIT  = FREE_LIMITS.pdfMergeFiles;
-    const FREE_SIZE_LIMIT  = FREE_LIMITS.pdfFileSizeMB * 1024 * 1024;
+    const OPEN_FILE_LIMIT  = OPEN_LIMITS.pdfMergeFiles;
+    const OPEN_SIZE_LIMIT  = OPEN_LIMITS.pdfFileSizeMB * 1024 * 1024;
 
     let files = [];
 
@@ -24,7 +24,7 @@ import { mergePDFs } from '../services/pdfMerge.js';
       const fileList = document.getElementById('fileList');
       fileList.innerHTML = '';
       files.forEach((f, i) => {
-        const oversized = !isPremium() && f.size > FREE_SIZE_LIMIT;
+        const oversized = !isPremium() && f.size > OPEN_SIZE_LIMIT;
         const li = document.createElement('li');
         li.className = 'file-item'; li.draggable = true; li.dataset.index = i;
         li.innerHTML = `
@@ -57,7 +57,7 @@ import { mergePDFs } from '../services/pdfMerge.js';
     }
 
     function updateState() {
-      const over = !isPremium() && files.length > FREE_FILE_LIMIT;
+      const over = !isPremium() && files.length > OPEN_FILE_LIMIT;
       document.getElementById('controls').classList.toggle('hidden', files.length < 2);
       document.getElementById('proCard').classList.toggle('hidden', !over);
     }
@@ -102,10 +102,10 @@ import { mergePDFs } from '../services/pdfMerge.js';
 
     document.getElementById('mergeBtn').addEventListener('click', async () => {
       if (files.length < 2) return;
-      if (files.length > FREE_FILE_LIMIT && !isPremium()) {
-        requirePremium(`Merging ${files.length} files (limit without Pro: ${FREE_FILE_LIMIT})`, 'pdf-merge-count'); return;
+      if (files.length > OPEN_FILE_LIMIT && !isPremium()) {
+        requirePremium(`Merging ${files.length} files (limit without Pro: ${OPEN_FILE_LIMIT})`, 'pdf-merge-count'); return;
       }
-      const oversized = files.find(f => f.size > FREE_SIZE_LIMIT);
+      const oversized = files.find(f => f.size > OPEN_SIZE_LIMIT);
       if (oversized && !isPremium()) {
         requirePremium(`"${oversized.name}" is ${formatBytes(oversized.size)} — the limit without Pro is 10MB`, 'pdf-merge-size'); return;
       }

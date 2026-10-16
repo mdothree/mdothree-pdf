@@ -1,7 +1,7 @@
 // Page controller: compress.html
 import { compressPDF } from '../services/pdfCompress.js';
     import { formatBytes, downloadBlob, isPdfFile } from '../utils/fileHandlers.js';
-    import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+    import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
     import { saveToHistory } from '../config/firebase.js';
 
     const dropZone = document.getElementById('dropZone');
@@ -12,7 +12,7 @@ import { compressPDF } from '../services/pdfCompress.js';
     const downloadBtn = document.getElementById('downloadBtn');
     const alertArea = document.getElementById('alertArea');
     let currentFile = null, compressedBlob = null, outputIsOriginal = false;
-    const FREE_SIZE = FREE_LIMITS.pdfFileSizeMB * 1024 * 1024;
+    const OPEN_SIZE = OPEN_LIMITS.pdfFileSizeMB * 1024 * 1024;
     initPaywall().then(p => { if(p) { const b=document.getElementById('freeBanner'); if(b) b.remove(); } });
 
     qualitySlider.addEventListener('input', () => { qualityVal.textContent = qualitySlider.value + '%'; });

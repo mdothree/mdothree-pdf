@@ -3,7 +3,7 @@
 // Feeds the nav cluster (site-chrome.js) with the REAL Firebase auth state and the checkout flag.
 //  - PRO_CHECKOUT_ENABLED=false (#66b, today): nothing changes. The Pro control stays
 //    "Pro (coming soon)" -> mdothree.com/pro and signed-out visitors see no account control.
-//  - When it is on (with its Stripe + functions config, same rule as stripe-paywall.js) the Pro control
+//  - When it is on (with its functions base URL, same rule as stripe-paywall.js) the Pro control
 //    opens /pricing and signed-out visitors get a "Sign in" button that opens js/auth-ui.js.
 //  - A real (non-anonymous) Firebase user gets the account menu: Your account (/account) + Sign out.
 //  - openSignIn() is the one entry point the Pro / account UI uses; auth-ui.js loads only when it is called.
@@ -16,7 +16,7 @@ const chromeReady = () => window.mdoChrome
   ? Promise.resolve(window.mdoChrome)
   : new Promise(res => document.addEventListener('mdo-chrome-ready', () => res(window.mdoChrome), { once: true }));
 
-export const checkoutOn = ENV.PRO_CHECKOUT_ENABLED === true && !!ENV.STRIPE_PUBLISHABLE_KEY && !!ENV.FIREBASE_FUNCTION_BASE_URL;
+export const checkoutOn = ENV.PRO_CHECKOUT_ENABLED === true && !!ENV.FIREBASE_FUNCTION_BASE_URL;   // Stripe-hosted Checkout: no publishable key needed
 
 async function getAuthInstance() {
   const fb = await import('./config/firebase.js');

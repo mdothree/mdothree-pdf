@@ -1,6 +1,6 @@
 // Page controller: images-to-pdf.html
 import { imagesToPDF } from '../services/imagesToPdf.js';
-import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
     import { formatBytes, downloadBlob } from '../utils/fileHandlers.js';
 
@@ -20,7 +20,7 @@ initPaywall();
       files.forEach((f, i) => {
         const url = URL.createObjectURL(f);
         const wrap = document.createElement('div');
-        wrap.style.cssText = 'position:relative;background:var(--slate-800);border-radius:8px;overflow:hidden;cursor:grab;';
+        wrap.style.cssText = 'position:relative;background:var(--slate-800);border-radius:4px;overflow:hidden;cursor:grab;';
         wrap.draggable = true;
         wrap.dataset.index = i;
         const img = document.createElement('img');

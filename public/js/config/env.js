@@ -33,14 +33,12 @@ export const ENV = {
 
   // ── Stripe ─────────────────────────────────────────────────
   STRIPE_PUBLISHABLE_KEY:      getEnv('STRIPE_PUBLISHABLE_KEY'),
-  STRIPE_PRICE_MONTHLY:        getEnv('STRIPE_PRICE_MONTHLY'),
-  STRIPE_PRICE_YEARLY:         getEnv('STRIPE_PRICE_YEARLY'),
 
   // ── App ────────────────────────────────────────────────────
   FIREBASE_FUNCTION_BASE_URL:  getEnv('FIREBASE_FUNCTION_BASE_URL'),
   APP_ENV:                     getEnv('APP_ENV', 'production'),
   // MDOTHREE-TRIAL-PATH-UNVERIFIED: Pro checkout stays off until the operator
-  // configures Stripe prices + the createSubscription endpoint and sets this to 'true'.
+  // configures the createCheckoutSession endpoint (lifetime Stripe price) and sets this to 'true'.
   PRO_CHECKOUT_ENABLED:        getEnv('PRO_CHECKOUT_ENABLED') === 'true',
 };
 

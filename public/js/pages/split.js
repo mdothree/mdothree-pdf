@@ -1,6 +1,6 @@
 // Page controller: split.html
 import { splitPDF } from '../services/pdfSplit.js';
-import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
     import { formatBytes, isPdfFile } from '../utils/fileHandlers.js';
 

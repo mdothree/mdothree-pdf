@@ -1,9 +1,9 @@
 /* pricing.html page styles */
 
 .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 720px; margin: 40px auto; }
-    .price-card { background: var(--slate-900); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 32px; position: relative; }
+    .price-card { background: var(--slate-900); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 32px; position: relative; }
     .price-card.featured { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.04); box-shadow: 0 0 40px rgba(16,185,129,0.1); }
-    .price-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--emerald); color: var(--slate-950); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; padding: 4px 14px; border-radius: 999px; white-space: nowrap; }
+    .price-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--emerald); color: var(--slate-950); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; padding: 4px 14px; border-radius: 4px; white-space: nowrap; }
     .price-name { font-family: var(--font-mono); font-size: 0.85rem; color: var(--slate-400); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
     .price-amount { font-family: var(--font-mono); font-size: 3rem; font-weight: 500; color: var(--white); line-height: 1; }
     .price-amount sup { font-size: 1.2rem; vertical-align: super; }

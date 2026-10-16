@@ -1,5 +1,6 @@
-// account.js page controller
-import { initPaywall, isPremium, openBillingPortal, subscriptionInfo, PRO_CHECKOUT_ENABLED } from '../stripe-paywall.js';
+// account.js page controller — MDOThree shared template (family B). Source: shared/mdothree/account.js.
+// mdothree Pro is a lifetime purchase: the page shows "Pro, lifetime" and a Receipts link (Stripe portal).
+import { initPaywall, openBillingPortal, subscriptionInfo, PRO, PRO_CHECKOUT_ENABLED } from '../stripe-paywall.js';
 import { initFirebase, getHistory, auth } from '../config/firebase.js';
 
 const loadingState   = document.getElementById('loadingState');
@@ -31,14 +32,11 @@ function formatDate(ts) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-function formatExpiry(millis) {
-  if (!millis) return '';
-  const d = new Date(millis);
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
-
 function showAlert(type, msg) {
-  alertArea.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  const div = document.createElement('div');
+  div.className = `alert alert-${type}`;
+  div.textContent = msg;
+  alertArea.replaceChildren(div);
   setTimeout(() => { alertArea.innerHTML = ''; }, 5000);
 }
 
@@ -82,7 +80,7 @@ async function init() {
       // Sign-in opens with Pro checkout (#66b). Until then this card keeps its "coming soon" copy.
       const h = anonState.querySelector('h2'); const p = anonState.querySelector('p');
       if (h) h.textContent = 'Sign in to your account';
-      if (p) p.textContent = 'Sign in or create an mdothree account to manage Pro and billing. One account works on every mdothree tool.';
+      if (p) p.textContent = 'Sign in or create an mdothree account to see Pro and your receipts. One account works on every mdothree tool.';
       signUpBtn.textContent = 'Sign in or create an account';
       signUpBtn.addEventListener('click', async () => {
         const { openSignIn } = await import('../auth-nav.js');
@@ -99,64 +97,46 @@ async function init() {
 
   accountContent.classList.remove('hidden');
 
-  // Subscription status
+  // Pro status (lifetime: no renewal, nothing to cancel)
   const planBadge   = document.getElementById('planBadge');
   const planDetails = document.getElementById('planDetails');
   const subActions  = document.getElementById('subActions');
-  const cancelBtn   = document.getElementById('cancelBtn');
 
-  if (premium) {
-    planBadge.innerHTML = `<span style="color:var(--emerald);font-size:1.3rem;">✨</span> <span style="color:var(--emerald);">Pro</span>`;
+  if (premium && subscriptionInfo()) {
+    planBadge.innerHTML = `<span style="color:var(--emerald);">Pro, lifetime</span>`;
+    planDetails.textContent = 'One payment. Pro never expires on this account, on every mdothree tool.';
 
-    // Renewal facts come from the webhook-written subscriptions/{uid} doc (read by initPaywall).
-    const info = subscriptionInfo();
-    if (info && info.cancelAtPeriodEnd && info.periodEnd) {
-      planDetails.textContent = `Cancels ${formatExpiry(info.periodEnd)}. You keep access until then.`;
-    } else if (info && info.periodEnd) {
-      planDetails.textContent = `Renews ${formatExpiry(info.periodEnd)}.`;
-      cancelBtn.style.display = 'inline-flex';
-    }
-
-    // Billing portal button
+    // Receipts live in the Stripe Customer Portal (createBillingPortalSession).
     const portalBtn = document.createElement('button');
     portalBtn.className = 'btn btn-secondary';
-    portalBtn.textContent = '💳 Manage Billing';
+    portalBtn.textContent = 'Receipts';
     portalBtn.addEventListener('click', async () => {
       portalBtn.disabled = true;
       portalBtn.textContent = 'Opening...';
       try {
         await openBillingPortal(window.location.href);
       } catch (e) {
-        showAlert('error', '❌ ' + e.message);
+        showAlert('error', e.message);
         portalBtn.disabled = false;
-        portalBtn.textContent = '💳 Manage Billing';
+        portalBtn.textContent = 'Receipts';
       }
     });
     subActions.appendChild(portalBtn);
 
   } else {
     planBadge.innerHTML = `<span style="color:var(--slate-400);">Not on Pro</span>`;
-    planDetails.textContent = 'Pro is coming soon: unlimited file sizes, batch processing, and more. Nothing to buy yet.';
     const upgradeBtn = document.createElement('a');
     upgradeBtn.className = 'btn btn-primary';
     upgradeBtn.href = '/pricing';
-    upgradeBtn.textContent = '✨ Pro (coming soon) →';
+    if (PRO_CHECKOUT_ENABLED) {
+      planDetails.textContent = `mdothree Pro is ${PRO.price} once, lifetime. No subscription.`;
+      upgradeBtn.textContent = `Get Pro, ${PRO.price} once`;
+    } else {
+      planDetails.textContent = 'Pro is coming soon. Nothing to buy yet.';
+      upgradeBtn.textContent = 'Pro (coming soon)';
+    }
     subActions.appendChild(upgradeBtn);
   }
-
-  // Cancel button: cancellation happens in the Stripe Customer Portal
-  // (createBillingPortalSession); the webhook then records cancelAtPeriodEnd.
-  cancelBtn.addEventListener('click', async () => {
-    cancelBtn.disabled = true;
-    cancelBtn.textContent = 'Opening billing...';
-    try {
-      await openBillingPortal(window.location.href);
-    } catch (e) {
-      showAlert('error', '❌ ' + e.message);
-      cancelBtn.disabled = false;
-      cancelBtn.textContent = 'Cancel Plan';
-    }
-  });
 
   // Load history
   await loadHistory();

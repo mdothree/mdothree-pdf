@@ -97,7 +97,7 @@
     '#mdo-consent .mdo-c-title{display:block;font-weight:700;font-size:16px;margin:0 0 4px;color:#fff}',
     '#mdo-consent a{color:#cdd6ff;text-decoration:underline}',
     '#mdo-consent .mdo-c-actions{display:flex;gap:12px;flex:0 0 auto}',
-    '#mdo-consent button{min-width:112px;min-height:44px;padding:10px 20px;border-radius:6px;border:2px solid #fff;',
+    '#mdo-consent button{min-width:112px;min-height:44px;padding:10px 20px;border-radius:4px;border:2px solid #fff;',
     'background:#fff;color:#16161d;font:700 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer}',
     '#mdo-consent button:hover{background:#e6e9ff}',
     '#mdo-consent a:focus-visible,#mdo-consent button:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}',

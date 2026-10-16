@@ -5,14 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Account — mdothree PDF Tools</title>
-  <meta name="description" content="Manage your mdothree Pro subscription for PDF Tools: view your usage history, update billing details, and sign in or out of your account." />
-  <meta name="keywords" content="mdothree account, pro subscription, billing, usage history, sign in" />
+  <meta name="description" content="Your mdothree account for PDF Tools: Pro status (a one-time lifetime purchase), receipts, and your usage history." />
+  <meta name="keywords" content="mdothree account, mdothree pro, receipts, usage history, sign in" />
   <meta name="robots" content="noindex" />
   <link rel="canonical" href="https://pdf.mdothree.com/account" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="mdothree" />
   <meta property="og:title" content="Account — mdothree PDF Tools" />
-  <meta property="og:description" content="Manage your mdothree Pro subscription for PDF Tools: view your usage history, update billing details, and sign in or out of your account." />
+  <meta property="og:description" content="Your mdothree account for PDF Tools: Pro status (a one-time lifetime purchase), receipts, and your usage history." />
   <meta property="og:url" content="https://pdf.mdothree.com/account" />
   <meta property="og:image" content="https://pdf.mdothree.com/og-image.png" />
   <meta property="og:image:type" content="image/png" />
@@ -21,7 +21,7 @@
   <meta property="og:image:alt" content="PDF Tools by mdothree" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Account — mdothree PDF Tools" />
-  <meta name="twitter:description" content="Manage your mdothree Pro subscription for PDF Tools: view your usage history, update billing details, and sign in or out of your account." />
+  <meta name="twitter:description" content="Your mdothree account for PDF Tools: Pro status (a one-time lifetime purchase), receipts, and your usage history." />
   <meta name="twitter:image" content="https://pdf.mdothree.com/og-image.png" />
   <meta name="twitter:image:alt" content="PDF Tools by mdothree" />
   <meta name="theme-color" content="#10B981" />
@@ -29,7 +29,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
-  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "Account — mdothree PDF Tools", "url": "https://pdf.mdothree.com/account", "description": "Manage your mdothree Pro subscription for PDF Tools: view your usage history, update billing details, and sign in or out of your account.", "isPartOf": {"@type": "WebSite", "name": "mdothree", "url": "https://pdf.mdothree.com/"}}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "Account — mdothree PDF Tools", "url": "https://pdf.mdothree.com/account", "description": "Your mdothree account for PDF Tools: Pro status (a one-time lifetime purchase), receipts, and your usage history.", "isPartOf": {"@type": "WebSite", "name": "mdothree", "url": "https://pdf.mdothree.com/"}}]}</script>
   <!-- /SEO -->
   <meta name="color-scheme" content="dark light" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
@@ -64,7 +64,7 @@
 
       <div class="tool-header animate-fade-up">
         <h1>👤 Your Account</h1>
-        <p>Manage your subscription and review your tool usage.</p>
+        <p>See your Pro status and review your tool usage.</p>
       </div>
 
       <!-- Loading state -->
@@ -84,9 +84,9 @@
       <!-- Signed in content -->
       <div id="accountContent" class="hidden">
 
-        <!-- Subscription status card -->
+        <!-- Pro status card -->
         <div class="panel animate-fade-up" id="subCard">
-          <div class="panel-title">Subscription</div>
+          <div class="panel-title">mdothree Pro</div>
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
             <div>
               <div id="planBadge" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:1rem;margin-bottom:8px;"></div>
@@ -105,18 +105,6 @@
           <div id="historyList"></div>
           <div id="historyEmpty" class="hidden" style="text-align:center;padding:32px;color:var(--slate-600);font-family:var(--font-mono);font-size:0.85rem;">
             No usage history yet. Start using the tools!
-          </div>
-        </div>
-
-        <!-- Danger zone -->
-        <div class="panel mt-20 animate-fade-up-3" style="border-color:rgba(239,68,68,0.2);">
-          <div class="panel-title" style="color:var(--danger);">Danger Zone</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-            <div>
-              <p class="text-sm" style="color:var(--slate-300);margin-bottom:4px;">Cancel subscription</p>
-              <p class="text-sm text-muted">You'll keep Pro access until the end of your billing period.</p>
-            </div>
-            <button class="btn btn-danger" id="cancelBtn" style="display:none;">Cancel Plan</button>
           </div>
         </div>
 

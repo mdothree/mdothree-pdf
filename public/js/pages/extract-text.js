@@ -1,6 +1,6 @@
 // Page controller: extract-text.html
 import { extractText } from '../services/textExtract.js';
-import { initPaywall, isPremium, requirePremium, FREE_LIMITS } from '../stripe-paywall.js';
+import { initPaywall, isPremium, requirePremium, OPEN_LIMITS } from '../stripe-paywall.js';
 import { saveToHistory } from '../config/firebase.js';
     import { formatBytes, isPdfFile } from '../utils/fileHandlers.js';
 
@@ -38,7 +38,7 @@ initPaywall();
 
     extractBtn.addEventListener('click', async () => {
       if (!currentFile) return;
-      if (currentFile && currentFile.size > FREE_LIMITS.pdfFileSizeMB * 1024 * 1024 && !isPremium()) {
+      if (currentFile && currentFile.size > OPEN_LIMITS.pdfFileSizeMB * 1024 * 1024 && !isPremium()) {
         requirePremium(`Extracting text from files over 10MB requires Pro`, 'pdf-extract-size');
         return;
       }
