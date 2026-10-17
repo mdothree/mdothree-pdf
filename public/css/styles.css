@@ -1160,3 +1160,6 @@ html[data-theme="light"] input[type="range"] {
 @media (max-width: 420px) {
   .nav-logo > span[style] { display: none; }   /* the "/ tool" suffix: the page title already names the tool */
 }
+
+/* No italics (Principal 10-16): emphasis by colour or weight. */
+em, i, cite, q, dfn, var, address, blockquote { font-style: normal; }

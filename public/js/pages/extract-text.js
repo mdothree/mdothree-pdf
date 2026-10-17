@@ -45,7 +45,7 @@ initPaywall();
       extractBtn.disabled = true;
       document.getElementById('progressWrap').classList.remove('hidden');
       alertArea.innerHTML = '';
-      textOutput.style.fontStyle = 'italic';
+      textOutput.style.fontStyle = 'normal';
       textOutput.textContent = 'Extracting...';
       try {
         const pageRange = document.getElementById('pageRange').value;
