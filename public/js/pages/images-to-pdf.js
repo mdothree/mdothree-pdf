@@ -13,12 +13,16 @@ import { saveToHistory } from '../config/firebase.js';
     const alertArea = document.getElementById('alertArea');
     let files = [];
     let dragSrc = null;
+    let previewUrls = []; // CQA-PDF-PREVIEW-URL-LIFETIME: blob URLs of the current render
 initPaywall();
 
     function renderPreviews() {
+      previewUrls.forEach(u => URL.revokeObjectURL(u));
+      previewUrls = [];
       previewGrid.innerHTML = '';
       files.forEach((f, i) => {
         const url = URL.createObjectURL(f);
+        previewUrls.push(url);
         const wrap = document.createElement('div');
         wrap.style.cssText = 'position:relative;background:var(--slate-800);border-radius:8px;overflow:hidden;cursor:grab;';
         wrap.draggable = true;
