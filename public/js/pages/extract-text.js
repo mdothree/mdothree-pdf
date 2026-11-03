@@ -43,6 +43,10 @@ initPaywall();
         return;
       }
       extractBtn.disabled = true;
+      // CQA-PDF-EXTRACT-STALE-EXPORT: drop the previous result before the new run so a failure cannot export it
+      extractedText = '';
+      document.getElementById('statsPanel').style.display = 'none';
+      document.getElementById('outputActions').style.display = 'none';
       document.getElementById('progressWrap').classList.remove('hidden');
       alertArea.innerHTML = '';
       textOutput.style.fontStyle = 'normal';
@@ -80,12 +84,14 @@ initPaywall();
     });
 
     copyBtn.addEventListener('click', async () => {
+      if (!extractedText) return;
       await navigator.clipboard.writeText(extractedText);
       copyBtn.textContent = '✅ Copied!';
       setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
     });
 
     downloadTxtBtn.addEventListener('click', () => {
+      if (!extractedText) return;
       const blob = new Blob([extractedText], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
