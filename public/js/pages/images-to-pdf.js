@@ -79,18 +79,20 @@ initPaywall();
 
     convertBtn.addEventListener('click', async () => {
       if (!files.length) return;
+      // CQA-PDF-MUTABLE-JOB-INPUT: convert a snapshot; remove/reorder/clear mutate `files` while the job runs
+      const job = files.slice();
       convertBtn.disabled = true;
       document.getElementById('progressWrap').classList.remove('hidden');
       alertArea.innerHTML = '';
       try {
         const pageSize = document.getElementById('pageSize').value;
         const outputName = document.getElementById('outputName').value || 'images.pdf';
-        const blob = await imagesToPDF(files, { pageSize }, (pct, label) => {
+        const blob = await imagesToPDF(job, { pageSize }, (pct, label) => {
           document.getElementById('progressFill').style.width = pct + '%';
           document.getElementById('progressLabel').textContent = label;
         });
         downloadBlob(blob, /\.pdf$/i.test(outputName) ? outputName : `${outputName}.pdf`);
-        const pages = blob.pageCount ?? files.length;
+        const pages = blob.pageCount ?? job.length;
         const skipped = blob.skipped || [];
         alertArea.innerHTML = '';
         const div = document.createElement('div');
