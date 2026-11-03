@@ -18,6 +18,7 @@ import { saveToHistory } from '../config/firebase.js';
 initPaywall();;
     let totalPages = 0;
     let currentMode = 'range';
+    let loadSeq = 0; // CQA-MDOTHREE-PDF-LOAD-ORDER: only the newest selection may apply its parse result
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -39,12 +40,14 @@ initPaywall();;
     }
 
     async function loadFile(file) {
+      const seq = ++loadSeq;
       alertArea.innerHTML = '';
       if (!isPdfFile(file)) { showError("That file isn't a PDF. Drop a .pdf file to split it."); return; }
       try {
         const { PDFDocument } = await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
         const bytes = await file.arrayBuffer();
         const pdf = await PDFDocument.load(bytes);
+        if (seq !== loadSeq) return;
         currentFile = file;
         totalPages = pdf.getPageCount();
         document.getElementById('fileName').textContent = file.name;
@@ -53,6 +56,7 @@ initPaywall();;
         fileInfo.classList.remove('hidden');
         controls.classList.remove('hidden');
       } catch (err) {
+        if (seq !== loadSeq) return;
         currentFile = null; totalPages = 0;
         fileInfo.classList.add('hidden'); controls.classList.add('hidden');
         const encrypted = /encrypt/i.test(err.message || '');
@@ -72,6 +76,7 @@ initPaywall();;
     });
 
     clearBtn.addEventListener('click', () => {
+      loadSeq++;
       currentFile = null; totalPages = 0;
       fileInfo.classList.add('hidden'); controls.classList.add('hidden');
       alertArea.innerHTML = '';
